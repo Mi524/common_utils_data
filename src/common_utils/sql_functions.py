@@ -1,80 +1,26 @@
+from typing import final
 from common_utils.os_functions import enter_exit 
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 from pathlib import Path
-from configparser import ConfigParser
 from shutil import copyfile 
 import pandas as pd 
 import traceback
 import logging
 import os 
-import cx_Oracle 
 
-# 批量扫描需要增加的表是否都有数据且数据正常更新
+def get_most_upper_level_path(file_name):
+    #获取最高一个层级的目录位置，用来做临时文件储存地点
+    cwd_upper_dir = Path(os.getcwd())
+    cwd_most_upper_level = str(cwd_upper_dir).split('\\',1)[0]
 
-def get_connection_by_config(config_path= 'connection_config.ini',database_type='mysql'):
-    cfparser = ConfigParser()
-    cfparser.read('connection_config.ini',encoding="utf-8")
-    # config_sections = cfparser.sections()
+    temp_path = os.path.join(f'{cwd_most_upper_level}',f'\\{file_name}')
 
-    host = cfparser.get(database_type,'host')
-    port = cfparser.get(database_type,'port')
-    database = cfparser.get(database_type,'database')
-    charset = cfparser.get(database_type,'charset')
-    username = cfparser.get(database_type,'username')
-    password = cfparser.get(database_type,'password')
+    if os.path.exists(temp_path):
+        os.remove(temp_path)    
 
-    if database_type == 'mssql':
-        database_type += '+pymssql'
-
-    engine_text = f'{database_type}://{username}:{password}@{host}:{port}/{database}?charset={charset}'
-
-    conn, db = get_sql_connection(engine_text)
-
-    return conn, db
-
-def gen_engine_text(config_path, database_type):
-    #读取ini配置
-    cfparser = ConfigParser()
-    cfparser.read(config_path,encoding="utf-8")
-    config_sections = cfparser.sections()
-
-    host = cfparser.get(database_type,'host')
-    port = cfparser.get(database_type,'port')
-    database = cfparser.get(database_type,'database')
-    charset = cfparser.get(database_type,'charset')
-    username = cfparser.get(database_type,'username')
-    password = cfparser.get(database_type,'password')
-
-    engine_text = f'{database_type}://{username}:{password}@{host}:{port}/{database}?charset={charset}'
-
-    if 'oracle' in database_type.lower():
-        #Oracle需要指定client位置
-        lib_dir = cfparser.get(database_type,'oci_folder_path')
-        cx_Oracle.init_oracle_client(lib_dir=lib_dir)
-
-        database = cfparser.get(database_type,'database')
-        try:
-            service_name = cfparser.get(database_type,'service_name')
-        except:
-            service_name = ''
-
-        try:
-            sid = cfparser.get(database_type,'sid')
-        except:
-            sid = ''
-
-    # engine = create_engine("oracle+cx_oracle://<username>:<password>@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = <host>)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = devdb)))") 
-
-    if 'oracle' in database_type.lower() and service_name != '':
-        engine_text = f'{database_type}://{username}:{password}@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = {host})(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (schema={database}) (SERVICE_NAME = {service_name}) (CHARSET=utf8)))'
-
-    if 'oracle' in database_type.lower() and sid != '':
-        engine_text = f'{database_type}://{username}:{password}@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = {host})(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (schema={database})(SID = {sid}) (CHARSET=utf8)))'
-
-    return engine_text
-
+    return temp_path
 
 def get_sql_connection(engine_text):
     db = create_engine(engine_text,poolclass= NullPool)
@@ -104,21 +50,12 @@ def convert_fetchall2df(fetchall_result):
 
 
 def execute_fetchall_engine(engine_text,sql):
-
+    # print(engine_text)
     db = create_engine(engine_text,poolclass= NullPool)
-
     conn = db.connect()
     result = None 
-
-    sql =  text(sql)
-
-    fetchall_result = conn.execute(sql).fetchall()
-
-    if fetchall_result :
-        result = pd.DataFrame(fetchall_result,columns=fetchall_result[0].keys())
-    else:
-        result = pd.DataFrame([])
     try:
+        sql =  text(sql)
         fetchall_result = conn.execute(sql).fetchall()
         if fetchall_result :
             print('Results get:{} rows'.format(len(fetchall_result)))
@@ -130,9 +67,9 @@ def execute_fetchall_engine(engine_text,sql):
         print('No data was found or unknow error happened\n:')
         logging.error(traceback.format_exc(e))
         return pd.DataFrame([])
-
-    conn.close()
-    db.dispose()
+    finally:
+        conn.close()
+        db.dispose()
 
     return result 
 
@@ -189,7 +126,6 @@ def write2table(engine_text,df,table_name,how='normal'):
     db = create_engine(engine_text,poolclass=NullPool)
     conn = db.connect()
 
-    #schema是发现oracle无法写入数据加上的
     if how == 'normal' :
         df.to_sql(table_name,con=conn,if_exists='append',index=False,chunksize=100000)
 
@@ -277,10 +213,7 @@ def load_sql_data(engine_text,table_name,load_file_path,if_truncate=False):
     """write csv file into table"""
     db = create_engine(engine_text,poolclass=NullPool)
     conn = db.connect()
-
     # temp_path = get_most_upper_level_path('df_temp_file.csv')
-
-
     #复制一份数据到英文路径
     # copyfile(load_file_path,temp_path)
 
@@ -416,15 +349,3 @@ def insert_update_table(engine_text,df,table_name):
 
     conn.close()
     db.dispose()
-
-
-if __name__ == '__main__' :
-    engine_text = gen_engine_text(r"E:\脚本\get_sql_data-master\connection_config.ini",'oracle+cx_oracle')
-
-    sql = f' select plateSymbol, symbol from scrap_platesymbol  '
-    fetch_result = execute_fetchall_engine(engine_text, sql)
-
-    for row in fetch_result.iterrows():
-        print(row[1])
-
-    # print(fetch_result)

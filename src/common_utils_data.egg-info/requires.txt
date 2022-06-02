@@ -10,5 +10,4 @@ pymysql>=1.0.2
 mysql-client
 flashtext
 swifter>=1.0.7
-pywin32
 cx_Oracle

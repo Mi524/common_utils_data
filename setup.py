@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="common_utils_data",
-    version="0.0.5",
+    version="0.0.7",
     author="Tracy Tang",
     author_email="tracytang58@icloud.com",
     description="common functions for data processing and database connections",
@@ -36,7 +36,6 @@ setuptools.setup(
       'mysql-client',
       'flashtext',
       'swifter>=1.0.7',
-      'pywin32',
       'cx_Oracle'
   ],
 )
