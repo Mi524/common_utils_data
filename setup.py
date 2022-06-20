@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="common_utils_data",
-    version="0.0.7",
+    version="0.0.8",
     author="Tracy Tang",
     author_email="tracytang58@icloud.com",
     description="common functions for data processing and database connections",
