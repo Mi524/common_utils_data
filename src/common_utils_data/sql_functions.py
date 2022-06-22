@@ -1,4 +1,4 @@
-from common_utils.os_functions import enter_exit 
+from .os_functions import enter_exit 
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
@@ -379,47 +379,50 @@ def insert_update_table(engine_text,df,table_name):
                             AND t.table_name='{0}';
         """.format(table_name))
 
-    result = conn.execute(sql_unique_key).fetchall()
+    try:
+        result = conn.execute(sql_unique_key).fetchall()
 
-    #结果只有一列,去掉seq
-    unique_columns = set([x.values()[0] for x in result if x.values()[0] !='seq'])
+        #结果只有一列,去掉seq
+        unique_columns = set([x.values()[0] for x in result if x.values()[0] !='seq'])
 
-    if unique_columns :  #如果存在唯一性约束（包括主键约束）
-        #需要更新的字段 去掉 唯一性约束字段 就是需要更新的字段
-        update_columns = [x for x in df.columns if x not in unique_columns]
-        #将数据写入临时表采用insert into on duplicate update的方式更新目的表
-        sql_drop_temp = text("drop table if exists temp_insert;")
-        
-        sql_insert = text(""" create temporary table temp_insert as 
-                              (select * from {0} );""".format(table_name))
+        if unique_columns :  #如果存在唯一性约束（包括主键约束）
+            #需要更新的字段 去掉 唯一性约束字段 就是需要更新的字段
+            update_columns = [x for x in df.columns if x not in unique_columns]
+            #将数据写入临时表采用insert into on duplicate update的方式更新目的表
+            sql_drop_temp = text("drop table if exists temp_insert;")
+            
+            sql_insert = text(""" create temporary table temp_insert as 
+                                  (select * from {0} );""".format(table_name))
 
-        conn.execute(sql_drop_temp)
-        conn.execute(sql_insert)
+            conn.execute(sql_drop_temp)
+            conn.execute(sql_insert)
 
-        df.to_sql('temp_insert',con=conn,if_exists='append',index=False)
+            df.to_sql('temp_insert',con=conn,if_exists='append',index=False)
 
-        conn.execute(""" set sql_safe_updates = 0; """)
+            conn.execute(""" set sql_safe_updates = 0; """)
 
-        sql_duplicate_update_list = [ ] 
-        for u in update_columns: 
-            sql_duplicate_update = """{0}.{1} = temp_insert.{1}""".format(table_name,u)
-            sql_duplicate_update_list.append(sql_duplicate_update)
+            sql_duplicate_update_list = [ ] 
+            for u in update_columns: 
+                sql_duplicate_update = """{0}.{1} = temp_insert.{1}""".format(table_name,u)
+                sql_duplicate_update_list.append(sql_duplicate_update)
 
-        sql_duplicate_update = ','.join(sql_duplicate_update_list)
+            sql_duplicate_update = ','.join(sql_duplicate_update_list)
 
-        sql_insert_update =  text("""insert ignore into {0} 
-                                   select * from temp_insert 
-                                   on duplicate key update 
-                                   {1};""".format(table_name,sql_duplicate_update))
+            sql_insert_update =  text("""insert ignore into {0} 
+                                       select * from temp_insert 
+                                       on duplicate key update 
+                                       {1};""".format(table_name,sql_duplicate_update))
 
-        conn.execute(sql_insert_update)
-        conn.execute("""drop table temp_insert;""")
+            conn.execute(sql_insert_update)
+            conn.execute("""drop table temp_insert;""")
 
-    else: #如果不存在唯一性约束,直接写入
-        df.to_sql(table_name,con=conn,if_exists='append',index=False)
-
-    conn.close()
-    db.dispose()
+        else: #如果不存在唯一性约束,直接写入
+            df.to_sql(table_name,con=conn,if_exists='append',index=False)
+    except Exception as e :
+        logging.error(traceback.format_exc(e))
+    finally :
+        conn.close()
+        db.dispose()
 
 
 if __name__ == '__main__' :

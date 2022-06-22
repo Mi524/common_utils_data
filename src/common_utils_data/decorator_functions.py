@@ -1,8 +1,8 @@
 import traceback 
 import logging 
 import datetime 
-from common_utils.os_functions import enter_exit
-from common_utils.excel_functions import write_format_columns
+from .os_functions import enter_exit
+from .excel_functions import write_format_columns
 from pandas import DataFrame
 
 #装饰器 可以放多个在一个函数上面

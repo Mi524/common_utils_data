@@ -1,0 +1,13 @@
+pandas>=1.2.0
+numpy
+openpyxl
+xlsxwriter
+xlwings
+html5lib
+lxml
+sqlalchemy>=1.3.22
+pymysql>=1.0.2
+mysql-client
+flashtext
+swifter>=1.0.7
+cx_Oracle

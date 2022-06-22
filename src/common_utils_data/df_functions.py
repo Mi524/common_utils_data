@@ -6,11 +6,11 @@ import os
 import sys
 import json
 from openpyxl import load_workbook
-from common_utils.os_functions import last_day_of_month,enter_exit, generate_md5
-from common_utils.regex_functions import replace_re_special, strQ2B, strB2Q,symbol_to_spaces, normalize_punctuations
-from common_utils.nlp_functions import get_keyword_dict, get_word_freq_dict, convert_key2list, process_text_eng
-from common_utils.excel_functions import write_format_columns
-from common_utils.func_classes import DfDict
+from .os_functions import last_day_of_month,enter_exit, generate_md5
+from .regex_functions import replace_re_special, strQ2B, strB2Q,symbol_to_spaces, normalize_punctuations
+from .nlp_functions import get_keyword_dict, get_word_freq_dict, convert_key2list, process_text_eng
+from .excel_functions import write_format_columns
+from .func_classes import DfDict
 import gc 
 import re 
 import warnings 

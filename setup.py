@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="common_utils_data",
-    version="0.0.8",
+    version="0.0.9",
     author="Tracy Tang",
     author_email="tracytang58@icloud.com",
-    description="common functions for data processing and database connections",
+    description="Fix bugs in the wrong imports",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Mi524/common_utils_pkg",

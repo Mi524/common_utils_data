@@ -7,7 +7,7 @@ import re
 import os 
 import time 
 import math
-from common_utils.os_functions import choose_file,choose_sheet_column,get_require_files
+from .os_functions import choose_file,choose_sheet_column,get_require_files
 
 import warnings 
 warnings.filterwarnings('ignore')

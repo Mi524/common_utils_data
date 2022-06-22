@@ -1,7 +1,7 @@
 import re 
 from collections import defaultdict, Counter
-from common_utils.regex_functions import replace_punctuations , replace_re_special, get_keyword_pat
-from common_utils.os_functions import enter_exit
+from .regex_functions import replace_punctuations , replace_re_special, get_keyword_pat
+from .os_functions import enter_exit
 import xlrd 
 
 def convert_key2list(word_dict):

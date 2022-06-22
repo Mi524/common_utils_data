@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: common-utils-data
+Version: 0.0.9
+Summary: Fix bugs in the wrong imports
+Home-page: https://github.com/Mi524/common_utils_pkg
+Author: Tracy Tang
+Author-email: tracytang58@icloud.com
+Project-URL: Bug Tracker, https://github.com/Mi524/common_utils_pkg/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+#数据处理常用的功能性函数，包括pandas的操作，EXCEL处理操作

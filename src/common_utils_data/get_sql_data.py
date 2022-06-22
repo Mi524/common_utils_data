@@ -1,6 +1,6 @@
-from common_utils.sql_functions import execute_fetchall_engine
-from common_utils.excel_functions import save_xlsxwriter_wb
-from common_utils.os_functions import enter_exit
+from .sql_functions import execute_fetchall_engine
+from .excel_functions import save_xlsxwriter_wb
+from .os_functions import enter_exit
 from xlsxwriter.exceptions import FileCreateError
 import re 
 import os 

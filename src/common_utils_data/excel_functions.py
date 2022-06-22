@@ -4,8 +4,8 @@ from openpyxl.utils import get_column_letter
 from collections import defaultdict, Counter
 from xlsxwriter.exceptions import FileCreateError
 from xlsxwriter import Workbook
-from common_utils.os_functions import check_create_new_folder
-from common_utils.sequence_functions import duplicate_elem_add_seq
+from .os_functions import check_create_new_folder
+from .sequence_functions import duplicate_elem_add_seq
 from decimal import Decimal
 import datetime 
 import re 
