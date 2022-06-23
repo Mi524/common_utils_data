@@ -78,7 +78,7 @@ def gen_engine_text(config_path, database_type):
 
 
 def get_sql_connection(engine_text):
-    db = create_engine(engine_text,poolclass= NullPool)
+    db = create_engine(engine_text,poolclass= NullPool,isolation_level='AUTOCOMMIT')
     conn = db.connect()
     return conn, db
 
@@ -130,7 +130,8 @@ def execute_fetchall_engine(engine_text,sql):
 
 def execute_updates_engine(engine_text,sql):
     #通过engine_text直接执行语句
-    conn, db = get_sql_connection(engine_text)
+    db = create_engine(engine_text,poolclass= NullPool,isolation_level='AUTOCOMMIT')
+    conn = db.connect()
     conn.execute(" set sql_safe_updates = 0; ")
     try:
         conn.execute(sql)
@@ -190,7 +191,7 @@ def write2table(engine_text,df,table_name,how='normal'):
                 3.mysql_load：直接通过mysql_load 方式写入 (这个方式经测试已经非常快，不用再重建索引也很快)
                （适用于特别大的数据集, 都需要确保MYSQL已经有完整的表结构）
     """
-    db = create_engine(engine_text,poolclass=NullPool)
+    db = create_engine(engine_text,poolclass=NullPool, isolation_level='AUTOCOMMIT')
     conn = db.connect()
 
     #schema是发现oracle无法写入数据加上的
@@ -279,7 +280,7 @@ def write2table(engine_text,df,table_name,how='normal'):
 
 def load_sql_data(engine_text,table_name,load_file_path,if_truncate=False):
     """write csv file into table"""
-    db = create_engine(engine_text,poolclass=NullPool)
+    db = create_engine(engine_text,poolclass=NullPool, isolation_level='AUTOCOMMIT')
     conn = db.connect()
 
     # temp_path = get_most_upper_level_path('df_temp_file.csv')
@@ -310,7 +311,7 @@ def load_sql_data(engine_text,table_name,load_file_path,if_truncate=False):
 
 def get_sql_data(engine_text,table_name,sql,save_path,how='normal'):
     """通过SQL获取到目标数据并保存到文档"""
-    db = create_engine(engine_text,poolclass=NullPool)
+    db = create_engine(engine_text,poolclass=NullPool, isolation_level='AUTOCOMMIT')
     conn = db.connect()
 
     if how == 'normal':
@@ -366,7 +367,7 @@ def get_sql_data(engine_text,table_name,sql,save_path,how='normal'):
 
 def insert_update_table(engine_text,df,table_name):
     """检查表的主键字段，根据主键字段，采用update的方式更新数据"""
-    db = create_engine(engine_text,poolclass=NullPool)
+    db = create_engine(engine_text,poolclass=NullPool, isolation_level='AUTOCOMMIT')
     conn = db.connect()
     
     sql_unique_key = text("""
@@ -379,59 +380,44 @@ def insert_update_table(engine_text,df,table_name):
                             AND t.table_name='{0}';
         """.format(table_name))
 
-    try:
-        result = conn.execute(sql_unique_key).fetchall()
+    result = conn.execute(sql_unique_key).fetchall()
 
-        #结果只有一列,去掉seq
-        unique_columns = set([x.values()[0] for x in result if x.values()[0] !='seq'])
+    #结果只有一列,去掉seq
+    unique_columns = set([x.values()[0] for x in result if x.values()[0] !='seq'])
 
-        if unique_columns :  #如果存在唯一性约束（包括主键约束）
-            #需要更新的字段 去掉 唯一性约束字段 就是需要更新的字段
-            update_columns = [x for x in df.columns if x not in unique_columns]
-            #将数据写入临时表采用insert into on duplicate update的方式更新目的表
-            sql_drop_temp = text("drop table if exists temp_insert;")
-            
-            sql_insert = text(""" create temporary table temp_insert as 
-                                  (select * from {0} );""".format(table_name))
+    if unique_columns :  #如果存在唯一性约束（包括主键约束）
+        #需要更新的字段 去掉 唯一性约束字段 就是需要更新的字段
+        update_columns = [x for x in df.columns if x not in unique_columns]
+        #将数据写入临时表采用insert into on duplicate update的方式更新目的表
+        sql_drop_temp = text("drop table if exists temp_insert;")
+        
+        sql_insert = text(""" create temporary table temp_insert as 
+                              (select * from {0} );""".format(table_name))
 
-            conn.execute(sql_drop_temp)
-            conn.execute(sql_insert)
+        conn.execute(sql_drop_temp)
+        conn.execute(sql_insert)
 
-            df.to_sql('temp_insert',con=conn,if_exists='append',index=False)
+        df.to_sql('temp_insert',con=conn,if_exists='append',index=False)
 
-            conn.execute(""" set sql_safe_updates = 0; """)
+        conn.execute(""" set sql_safe_updates = 0; """)
 
-            sql_duplicate_update_list = [ ] 
-            for u in update_columns: 
-                sql_duplicate_update = """{0}.{1} = temp_insert.{1}""".format(table_name,u)
-                sql_duplicate_update_list.append(sql_duplicate_update)
+        sql_duplicate_update_list = [ ] 
+        for u in update_columns: 
+            sql_duplicate_update = """{0}.{1} = temp_insert.{1}""".format(table_name,u)
+            sql_duplicate_update_list.append(sql_duplicate_update)
 
-            sql_duplicate_update = ','.join(sql_duplicate_update_list)
+        sql_duplicate_update = ','.join(sql_duplicate_update_list)
 
-            sql_insert_update =  text("""insert ignore into {0} 
-                                       select * from temp_insert 
-                                       on duplicate key update 
-                                       {1};""".format(table_name,sql_duplicate_update))
+        sql_insert_update =  text("""insert ignore into {0} 
+                                   select * from temp_insert 
+                                   on duplicate key update 
+                                   {1};""".format(table_name,sql_duplicate_update))
 
-            conn.execute(sql_insert_update)
-            conn.execute("""drop table temp_insert;""")
+        conn.execute(sql_insert_update)
+        conn.execute("""drop table temp_insert;""")
 
-        else: #如果不存在唯一性约束,直接写入
-            df.to_sql(table_name,con=conn,if_exists='append',index=False)
-    except Exception as e :
-        logging.error(traceback.format_exc(e))
-    finally :
-        conn.close()
-        db.dispose()
+    else: #如果不存在唯一性约束,直接写入
+        df.to_sql(table_name,con=conn,if_exists='append',index=False)
 
-
-if __name__ == '__main__' :
-    engine_text = gen_engine_text(r"E:\脚本\get_sql_data-master\connection_config.ini",'oracle+cx_oracle')
-
-    sql = f' select plateSymbol, symbol from scrap_platesymbol  '
-    fetch_result = execute_fetchall_engine(engine_text, sql)
-
-    for row in fetch_result.iterrows():
-        print(row[1])
-
-
+    conn.close()
+    db.dispose()
