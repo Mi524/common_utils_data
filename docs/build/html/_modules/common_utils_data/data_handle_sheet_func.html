@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.data_handle_sheet_func &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.data_handle_sheet_func</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.data_handle_sheet_func 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">gc</span> 
+<span class="kn">import</span> <span class="nn">re</span> 
+<span class="kn">import</span> <span class="nn">sys</span>  
+<span class="kn">import</span> <span class="nn">warnings</span> 
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">time</span>  
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> 
+<span class="kn">import</span> <span class="nn">warnings</span>   
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span><span class="n">Counter</span>
+
+<span class="kn">from</span> <span class="nn">.sequence_functions</span> <span class="kn">import</span> <span class="n">list_diff_outer_join</span><span class="p">,</span> <span class="n">lcs</span><span class="p">,</span> <span class="n">filter_lcs</span>
+<span class="kn">from</span> <span class="nn">.os_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.df_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.config_table</span> <span class="kn">import</span> <span class="n">ConfigReader</span> 
+<span class="kn">from</span> <span class="nn">.excel_functions</span> <span class="kn">import</span> <span class="n">write_format_columns</span>
+<span class="kn">from</span> <span class="nn">.regex_functions</span> <span class="kn">import</span> <span class="n">replace_re_special</span><span class="p">,</span> <span class="n">replace_punctuations</span>
+<span class="kn">from</span> <span class="nn">.decorator_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.data_handle_func</span> <span class="kn">import</span> <span class="o">*</span> 
+
+<span class="kn">from</span> <span class="nn">pandas.core.indexes.multi</span> <span class="kn">import</span> <span class="n">MultiIndex</span>
+
+<div class="viewcode-block" id="CsvSheetClass"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.data_handle_sheet_func.CsvSheetClass">[文档]</a><span class="k">class</span> <span class="nc">CsvSheetClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_path</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">visibility</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Handler"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.data_handle_sheet_func.Handler">[文档]</a><span class="k">class</span> <span class="nc">Handler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">require_file_dir</span><span class="p">,</span> <span class="n">input_dir</span><span class="p">,</span><span class="n">table_dict</span><span class="p">):</span>
+		<span class="c1">#获取以下两个即可读取所有的原始数据和规则表</span>
+		<span class="c1">#original data files </span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span> <span class="o">=</span> <span class="n">input_dir</span>
+		<span class="c1">#config table dict </span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">table_dict</span> <span class="o">=</span> <span class="n">table_dict</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">require_file_dir</span> <span class="o">=</span> <span class="n">require_file_dir</span>
+
+		<span class="c1"># #从concat_data得到的结果记录输入数据的最大最小日期</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">min_max_date_range</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> 
+
+		<span class="c1">#concat_data之后 保存一个原始表提供给后面的match做提取</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">original_complete_header_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+	<span class="nd">@catch_and_print</span>
+	<span class="k">def</span> <span class="nf">get_original2cn_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header_table_df</span><span class="p">,</span> <span class="n">file_tag</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		将所有原始mapping成中文表头,按国家区分字典</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">original2cn_dict_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">original2cn_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+		<span class="n">fillna_dict</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="n">dtype_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+		<span class="k">if</span> <span class="n">file_tag</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">]</span> <span class="p">:</span>
+			<span class="n">file_tag</span> <span class="o">=</span> <span class="s1">&#39;Without file tag&#39;</span>
+
+		<span class="n">header_column_index</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span>
+			<span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">file_tag</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+		<span class="n">header_table_df_c</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">header_column_index</span><span class="p">]</span>
+
+		<span class="n">header_table_first_three_c</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+
+		<span class="c1"># 同时获取填充的</span>
+		<span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">last_three</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">header_table_df_c</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">header_table_first_three_c</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+			<span class="c1"># 表头统一小写，换行符,空格全部去掉</span>
+			<span class="n">row_list</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+			<span class="n">last_three_list</span> <span class="o">=</span> <span class="n">last_three</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+			<span class="n">a_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_list</span><span class="p">)</span>
+			<span class="n">b_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">last_three_list</span><span class="p">)</span>
+			<span class="n">a_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\xa0</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+					  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">a_list</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;无&#39;</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="n">a_list</span><span class="p">:</span>
+				<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">a_list</span><span class="p">:</span>
+					<span class="n">original2cn_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+			<span class="c1"># 构建需要合并前填充的字典</span>
+			<span class="n">c_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">a_list</span> <span class="k">if</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;fillbeforeconcat&#39;</span> <span class="ow">or</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;合并前填充&#39;</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="n">c_list</span><span class="p">:</span>
+				<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">c_list</span><span class="p">:</span>
+					<span class="n">fillna_dict</span><span class="p">[</span><span class="n">b_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="p">(</span><span class="n">b_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;默认&#39;</span> <span class="ow">and</span> <span class="n">b_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span> <span class="ow">and</span> <span class="n">b_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">b_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+				<span class="n">dtype_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">b_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">b_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
+
+		<span class="k">return</span> <span class="n">original2cn_dict</span><span class="p">,</span> <span class="n">fillna_dict</span><span class="p">,</span> <span class="n">dtype_dict</span>
+
+	<span class="c1">#合并读取的数据表格, 该函数需要输入table_dict因为需要读取到, complete_header_df, 和target_cn_columns</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">concat_data</span><span class="p">(</span><span class="bp">self</span> <span class="p">):</span>
+		<span class="c1"># 此函数读取放入的数据表，必须要运行</span>
+		<span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+			<span class="k">if</span> <span class="s1">&#39;mapping&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+				<span class="n">mapping_key</span> <span class="o">=</span> <span class="n">keys</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">header_table_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_dict</span><span class="p">[</span><span class="n">mapping_key</span><span class="p">]</span>
+		<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+			<span class="n">enter_exit</span><span class="p">(</span><span class="s1">&#39;Cannot find mapping configuration sheet!&#39;</span><span class="p">)</span>
+
+		<span class="n">complete_header_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_dict</span><span class="p">[</span><span class="s1">&#39;complete_header_df&#39;</span><span class="p">]</span>
+		<span class="n">target_cn_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_dict</span><span class="p">[</span><span class="s1">&#39;target_cn_columns&#39;</span><span class="p">]</span>
+
+		<span class="n">header_table_df</span> <span class="o">=</span> <span class="n">df_fillna_str</span><span class="p">(</span><span class="n">header_table_df</span><span class="p">)</span>
+		<span class="n">info_path_list</span> <span class="o">=</span> <span class="n">get_walk_abs_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">)</span>
+
+		<span class="c1"># 检查是否有读取到各国的原始数据</span>
+		<span class="n">info_path_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">info_path_list</span> <span class="k">if</span> <span class="s1">&#39;~$&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span> <span class="ow">and</span> <span class="p">(</span>
+			<span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.xlsx&#39;</span> <span class="ow">or</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.xls&#39;</span><span class="p">,</span> <span class="s1">&#39;.csv&#39;</span><span class="p">])]</span>
+
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">info_path_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot find any data file in folder &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="si">}</span><span class="s1">&quot; !</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+		<span class="n">success_sheet_df_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="k">for</span> <span class="n">table_path</span> <span class="ow">in</span> <span class="n">info_path_list</span><span class="p">:</span>
+			<span class="n">table_p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+			<span class="n">table_stem</span> <span class="o">=</span> <span class="n">table_p</span><span class="o">.</span><span class="n">stem</span>
+			<span class="n">table_suffix</span> <span class="o">=</span> <span class="n">table_p</span><span class="o">.</span><span class="n">suffix</span>
+
+			<span class="c1"># 读取文件名的信息</span>
+			<span class="n">file_tag</span> <span class="o">=</span> <span class="n">table_stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+			<span class="c1"># 获取这个文档的映射字典  将原始mapping成中文表头</span>
+			<span class="n">original2cn_dict</span><span class="p">,</span> <span class="n">fillna_dict</span><span class="p">,</span> <span class="n">dtype_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_original2cn_dict</span><span class="p">(</span><span class="n">header_table_df</span><span class="p">,</span> <span class="n">file_tag</span><span class="p">)</span>
+
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">original2cn_dict</span><span class="p">:</span>
+				<span class="n">enter_exit</span><span class="p">(</span><span class="s1">&#39;&quot;Data_processing_configuration&quot; required mapping field &quot;</span><span class="si">{}</span><span class="s1">&quot; not found !&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_tag</span><span class="p">))</span>
+
+			<span class="c1"># 如果是CSV文档</span>
+			<span class="n">is_csv</span> <span class="o">=</span> <span class="kc">False</span>
+			<span class="n">is_xls_special</span> <span class="o">=</span> <span class="kc">False</span>
+			<span class="k">if</span> <span class="n">table_suffix</span> <span class="o">==</span> <span class="s1">&#39;.csv&#39;</span><span class="p">:</span>
+				<span class="n">is_csv</span> <span class="o">=</span> <span class="kc">True</span>
+				<span class="n">csv_sheet_class</span> <span class="o">=</span> <span class="n">CsvSheetClass</span><span class="p">(</span><span class="n">table_stem</span><span class="p">)</span>
+				<span class="n">sheets_property_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">csv_sheet_class</span><span class="p">]</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">df_workbook</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+					<span class="n">sheets_property_list</span> <span class="o">=</span> <span class="n">df_workbook</span><span class="o">.</span><span class="n">book</span><span class="o">.</span><span class="n">sheets</span><span class="p">()</span>
+					<span class="c1">#试下能不能读取第一个sheet</span>
+					<span class="n">df_workbook</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sheets_property_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+				<span class="k">except</span> <span class="p">:</span> <span class="c1">#如果读取失败，尝试读取其他国家xls文档的格式</span>
+					<span class="n">is_xls_special</span> <span class="o">=</span> <span class="kc">True</span> 
+					<span class="n">xls_sheet_class</span> <span class="o">=</span> <span class="n">CsvSheetClass</span><span class="p">(</span><span class="n">table_stem</span><span class="p">)</span>
+					<span class="n">sheets_property_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">xls_sheet_class</span><span class="p">]</span>
+
+			<span class="c1"># 过滤掉模板数据</span>
+			<span class="k">for</span> <span class="n">sheets_property</span> <span class="ow">in</span> <span class="n">sheets_property_list</span><span class="p">:</span>
+				<span class="n">sheet</span> <span class="o">=</span> <span class="n">sheets_property</span><span class="o">.</span><span class="n">name</span>
+				<span class="n">sheet_visibility</span> <span class="o">=</span> <span class="n">sheets_property</span><span class="o">.</span><span class="n">visibility</span>
+				<span class="k">if</span> <span class="n">sheet_visibility</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 只读取可见的Sheet</span>
+
+					<span class="k">if</span> <span class="n">is_csv</span><span class="p">:</span>
+						<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">read_csv_data</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+						<span class="k">if</span> <span class="n">df_worksheet</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+							<span class="k">continue</span>
+					<span class="k">elif</span> <span class="n">is_xls_special</span><span class="p">:</span> <span class="c1">#这个格式的只读第一个sheet</span>
+						<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">read_xls_special</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+						<span class="k">if</span> <span class="n">df_worksheet</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+							<span class="k">continue</span>
+					<span class="k">else</span><span class="p">:</span>
+						<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">df_workbook</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sheet</span><span class="p">),</span> <span class="n">na_values</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+					<span class="c1"># 表头做小写等替换并且，通过字典rename,全部调整成去掉中间空格、去掉一切无意义符号的字段</span>
+					<span class="n">df_worksheet</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\xa0</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+											<span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> 
+											<span class="n">df_worksheet</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+					<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">dropping_not_mapping</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">original2cn_dict</span><span class="p">,</span> <span class="n">target_cn_columns</span><span class="p">)</span>
+
+					<span class="c1">#mapping填入了 + 号</span>
+					<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">combine_multi_plus</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">original2cn_dict</span><span class="p">)</span>
+
+					<span class="c1">#mapping前检查是否有重复的字段，如果原表已经有别的字段映射成&quot;机型&quot;，那原表里面的&quot;机型&quot;字段属于要抛弃的字段</span>
+					<span class="n">df_work_sheet</span> <span class="o">=</span> <span class="n">drop_duplicated_columns_before_rename</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">original2cn_dict</span><span class="p">)</span>
+
+					<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">df_worksheet</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">original2cn_dict</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+					<span class="c1"># 还必须要确认映射的字段没有重复，否则会影响到后面的数据列, 返回一个没有重复的字段列</span>
+					<span class="n">df_work_sheet</span> <span class="o">=</span> <span class="n">check_mapping_duplicates</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">target_cn_columns</span><span class="p">,</span> <span class="n">table_stem</span><span class="o">=</span><span class="n">table_stem</span><span class="p">)</span>
+
+					<span class="c1"># 重命名之后，合并前需要填充默认值</span>
+					<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">fillna_with_dict</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">fillna_dict</span><span class="p">)</span>
+
+					<span class="c1"># 检查完重复映射之后 需要再定位一次需要的字段, 注意处理顺序</span>
+					<span class="n">df_worksheet</span> <span class="o">=</span> <span class="n">func_loc</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">target_cn_columns</span><span class="p">)</span>
+					
+					<span class="k">if</span> <span class="ow">not</span> <span class="n">df_worksheet</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+						<span class="n">check_mapping_complete</span><span class="p">(</span><span class="n">df_worksheet</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">original2cn_dict</span><span class="p">,</span><span class="n">file_tag</span><span class="o">=</span><span class="n">file_tag</span><span class="p">)</span>
+
+						<span class="c1">#做一次字段格式处理，可以提示在哪个文档转错，但后面合并还是会把date转成object,所以需要再转一次</span>
+						<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">dtype_handle</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">dtype_dict</span><span class="p">)</span>
+						<span class="c1"># 记录成功表格</span>
+						<span class="n">success_sheet_df_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">table_stem</span><span class="p">,</span> <span class="n">sheet</span><span class="p">,</span> <span class="n">df_worksheet</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+						<span class="c1">#complete_header_df 是一个完整的表头，可以避免concat造成的表头混乱/缺失，</span>
+						<span class="c1">#但合并会导致字段全变成object(CSV文档，xlsx的输入不受影响)</span>
+						<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">df_worksheet</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+						<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Getting from: &quot;</span><span class="si">{</span><span class="n">table_stem</span><span class="si">}</span><span class="s1">&quot;,Sheet:</span><span class="si">{</span><span class="n">sheet</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">df_worksheet</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> rows&#39;</span><span class="p">)</span>
+
+			<span class="n">success_sheet_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">success_sheet_df_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;File Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Source Sheet&#39;</span><span class="p">,</span> <span class="s1">&#39;Success reading records&#39;</span><span class="p">])</span>
+
+		<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">dtype_handle</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">dtype_dict</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">min_max_date_range</span> <span class="o">=</span> <span class="n">get_min_max_date</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">original_complete_header_df</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">success_sheet_df</span>
+
+
+	 <span class="c1"># 1.字段标准化: 是否考虑先做关联匹配以加速运行? -- 不可行，关联的国家字段需要先标准化才能用来统一关联匹配</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">standardize_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">standardize_config_df</span><span class="p">):</span>
+		<span class="c1"># 将字段处理为标准表里的字段（模糊匹配）</span>
+		<span class="n">table_values</span> <span class="o">=</span> <span class="n">standardize_config_df</span><span class="o">.</span><span class="n">values</span>
+		<span class="n">not_standardize_df_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">complete_header_df_sub_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">partial_match_not_match_df_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="n">row_counter</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">:</span>
+			<span class="n">row_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="n">source_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">standard_table_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="n">standard_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+			<span class="n">target_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">target_column_edit</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+			<span class="n">order_columns</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+			<span class="n">replace_dict</span> <span class="o">=</span> <span class="n">get_replace_dict</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+			<span class="n">special_syn</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)]</span>  <span class="c1">#两边需要同时存在的字符</span>
+			<span class="n">filter_condition</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+			<span class="c1"># 标准化模式：简单模糊匹配 -- simple_lcs  严格模糊匹配 -- filter_lcs, 内存配置匹配--number_similarity</span>
+			<span class="n">standardize_mode</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+
+			<span class="c1">#决定最后的结果字段名称</span>
+			<span class="n">temp_column</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+			<span class="k">if</span> <span class="n">target_column_edit</span> <span class="o">==</span> <span class="n">source_column</span><span class="p">:</span>
+				<span class="n">temp_column</span> <span class="o">=</span> <span class="n">source_column</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">temp_column</span> <span class="o">=</span> <span class="n">target_column_edit</span>
+
+			<span class="c1"># 先把空值的数据剔除再做模糊匹配</span>
+			<span class="n">complete_header_df_notna</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">complete_header_df</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">,</span> <span class="p">:]</span>
+			<span class="n">complete_header_df_nan</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">complete_header_df</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="p">:]</span>
+			<span class="c1">#过滤后全都是空值的话 直接继续下一行</span>
+			<span class="k">if</span> <span class="n">complete_header_df_notna</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+				<span class="k">continue</span>
+
+			<span class="k">if</span> <span class="n">standard_table_name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">standard_column</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+
+				<span class="n">mode</span> <span class="o">=</span> <span class="n">get_standard_mode</span><span class="p">(</span><span class="n">standardize_mode</span><span class="p">)</span>
+				
+				<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">row_counter</span><span class="si">}</span><span class="s1">.Processing standardization for &quot;</span><span class="si">{</span><span class="n">source_column</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-- Referencing from table &quot;</span><span class="si">{</span><span class="n">standard_table_name</span><span class="si">}</span><span class="s1">&quot; column &quot;</span><span class="si">{</span><span class="n">target_column</span><span class="si">}</span><span class="s1">&quot;,Mode:</span><span class="si">{</span><span class="n">standardize_mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+				<span class="n">standard_table_path</span> <span class="o">=</span> <span class="n">get_require_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">require_file_dir</span><span class="p">,</span> <span class="p">[</span><span class="n">standard_table_name</span><span class="p">])[</span><span class="n">standard_table_name</span><span class="p">]</span>
+				<span class="c1"># 统一将原始关联表转成str格式</span>
+				<span class="n">standard_table_df</span> <span class="o">=</span> <span class="n">read_config_table</span><span class="p">(</span><span class="n">standard_table_path</span><span class="p">)</span>
+				<span class="c1">##读取出来的表 统一做删除重复字段处理, 如果模式是机型匹配模式</span>
+				<span class="n">standard_table_df</span> <span class="o">=</span> <span class="n">remove_duplicate_columns</span><span class="p">(</span><span class="n">standard_table_df</span><span class="p">)</span>
+
+				<span class="c1"># 标准对照表排序,排序完之后删除重复项，似的做了排序后的结果取的是第一行上市日期最近的机型（后面循环的时候做duplicates删除）</span>
+				<span class="k">if</span> <span class="n">order_columns</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+					<span class="n">standard_table_df</span> <span class="o">=</span> <span class="n">process_sort_order</span><span class="p">(</span><span class="n">standard_table_df</span><span class="p">,</span> <span class="p">[</span><span class="n">standard_column</span><span class="p">],</span> <span class="n">order_columns</span><span class="p">)</span>
+
+				<span class="c1"># 需要对标准表做重复删除，类似字段匹配, 但不相同</span>
+				<span class="c1"># 标准化前的第一层简单过滤</span>
+				<span class="n">filter_condition_2_columns_tag</span><span class="p">,</span> <span class="n">filter_left_column</span><span class="p">,</span> <span class="n">filter_right_column</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+
+				<span class="k">if</span> <span class="n">filter_condition</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+					<span class="n">filter_condition_2_columns_tag</span><span class="p">,</span> <span class="n">filter_left_column</span><span class="p">,</span> <span class="n">filter_right_column</span> <span class="o">=</span> \
+						<span class="n">get_filter_condition_standardize_tag</span><span class="p">(</span><span class="n">filter_condition</span><span class="p">)</span>
+
+				<span class="k">if</span> <span class="n">filter_condition</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">filter_condition_2_columns_tag</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+					<span class="k">try</span><span class="p">:</span>
+						<span class="n">standard_table_df</span> <span class="o">=</span> <span class="n">standard_table_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">filter_condition</span><span class="p">)</span>
+					<span class="k">except</span><span class="p">:</span>
+						<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Standardization: Failed to compile condition: </span><span class="si">{</span><span class="n">filter_condition</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+				<span class="c1">#全部转成半角符号</span>
+				<span class="n">standard_table_df</span><span class="p">[</span><span class="n">standard_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">standard_table_df</span><span class="p">[</span><span class="n">standard_column</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+															<span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">normalize_punctuations</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">x</span> <span class="p">)</span> 
+				<span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+															<span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">normalize_punctuations</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+				<span class="c1"># 标准化前的第二层检查过滤(过滤条件涉及两张表的字段相等(不同国家的机型匹配))</span>
+				<span class="c1"># 如果存在另外一种过滤方式--左右表的字段相等, 需要循环条件 进行模糊匹配</span>
+				<span class="k">if</span> <span class="n">filter_condition_2_columns_tag</span><span class="p">:</span>
+					<span class="c1"># 模糊关联匹配之前，必须做去重，防止笛卡尔积现象（模糊匹配防止获取的不是排序第一的数据）</span>
+					<span class="n">find_lack_columns</span><span class="p">(</span> <span class="n">standard_table_df</span><span class="p">,</span> <span class="p">[</span><span class="n">standard_column</span><span class="p">,</span> <span class="n">target_column</span><span class="p">,</span> <span class="n">filter_left_column</span><span class="p">])</span>
+					<span class="c1"># 需要保留一个模糊匹配需要获取的 target_column</span>
+					<span class="n">standard_table_df_x</span> <span class="o">=</span> <span class="n">standard_table_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">standard_column</span><span class="p">,</span> <span class="n">target_column</span><span class="p">,</span> <span class="n">filter_left_column</span><span class="p">]]</span>\
+						<span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">standard_column</span><span class="p">,</span> <span class="n">filter_left_column</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>
+
+					<span class="c1"># 循环获取模糊匹配结果</span>
+					<span class="k">if</span> <span class="n">filter_right_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">complete_header_df_notna</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+						<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Standardization Error: Cannot find column:&quot;</span><span class="si">{</span><span class="n">filter_right_column</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+					<span class="c1">#记录每个的情况</span>
+					<span class="n">complete_header_df_sub_list</span> <span class="o">=</span> <span class="p">[]</span>
+					<span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">filter_right_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span> <span class="p">:</span>
+						<span class="n">temp_standard_df</span> <span class="o">=</span> <span class="n">standard_table_df_x</span>\
+								<span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">standard_table_df_x</span><span class="p">[</span><span class="n">filter_left_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">u</span><span class="p">,</span> <span class="p">[</span><span class="n">standard_column</span><span class="p">,</span> <span class="n">target_column</span><span class="p">]]</span>
+						<span class="n">standard_dict</span> <span class="o">=</span> <span class="n">temp_standard_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+						<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Standardizing: &quot;</span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s1">&quot;--&quot;</span><span class="si">{</span><span class="n">source_column</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+						<span class="n">standard_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+							<span class="n">standard_dict</span><span class="p">[</span><span class="n">standard_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">standard_dict</span><span class="p">[</span><span class="n">target_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())}</span>
+
+						<span class="n">complete_header_df_sub</span> <span class="o">=</span> <span class="n">complete_header_df_notna</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+							<span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">filter_right_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">u</span><span class="p">,</span> <span class="p">:]</span>
+
+						<span class="n">complete_header_df_sub</span><span class="p">[</span><span class="n">temp_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df_sub</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+						<span class="n">complete_header_df_sub</span><span class="p">[</span><span class="n">temp_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df_sub</span><span class="p">[</span><span class="n">temp_column</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+								<span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">standardize_column_func</span><span class="p">(</span>
+								<span class="n">x</span><span class="p">,</span> <span class="n">standard_dict</span><span class="p">,</span> <span class="n">special_syn</span><span class="p">,</span> <span class="n">replace_dict</span><span class="p">,</span> <span class="n">ignore_punctuation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">))</span>
+
+						<span class="n">complete_header_df_sub_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete_header_df_sub</span><span class="p">)</span>
+
+					<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">complete_header_df_sub_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+						<span class="n">complete_header_df_notna</span> <span class="o">=</span> <span class="n">complete_header_df_sub_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+					<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">complete_header_df_sub_list</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="p">:</span>
+						<span class="n">complete_header_df_notna</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">complete_header_df_sub_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+					<span class="k">else</span><span class="p">:</span> <span class="c1">#complete_header_df_sub都没有,生成一列空白的结果</span>
+						<span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">temp_column</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+				<span class="c1"># 如果是普通的df quiry过滤方式</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">lack_column_list</span> <span class="o">=</span> <span class="n">find_lack_columns</span><span class="p">(</span>
+									<span class="n">standard_table_df</span><span class="p">,</span> <span class="p">[</span><span class="n">standard_column</span><span class="p">,</span> <span class="n">target_column</span><span class="p">],</span><span class="s1">&#39;Standardization reference table&#39;</span><span class="p">)</span>
+					<span class="c1"># 提取出标准列表</span>
+					<span class="n">standard_dict</span> <span class="o">=</span> <span class="n">standard_table_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">standard_column</span><span class="p">,</span> <span class="n">target_column</span><span class="p">]]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+					<span class="n">standard_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+						<span class="n">standard_dict</span><span class="p">[</span><span class="n">standard_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">standard_dict</span><span class="p">[</span><span class="n">target_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())}</span>
+
+					<span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">temp_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df_notna</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span>\
+							<span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">standardize_column_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">standard_dict</span><span class="p">,</span> <span class="n">special_syn</span><span class="p">,</span> <span class="n">replace_dict</span><span class="p">,</span>
+													<span class="n">ignore_punctuation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+
+				<span class="c1"># 空的和处理过的非空数据记得合并</span>
+				<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">complete_header_df_notna</span><span class="p">,</span> <span class="n">complete_header_df_nan</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+				<span class="c1"># 需要记录这两个字段分别有哪些记录匹配不上</span>
+				<span class="n">partial_match_not_match_df</span> <span class="o">=</span> <span class="n">get_partial_not_match</span><span class="p">(</span><span class="n">complete_header_df_notna</span><span class="p">,</span><span class="n">row_counter</span><span class="p">,</span><span class="n">source_column</span><span class="p">,</span>
+																	<span class="n">standard_table_name</span><span class="p">,</span> <span class="n">standard_column</span><span class="p">,</span>
+																	<span class="n">filter_condition</span><span class="p">,</span> <span class="n">target_column_edit</span><span class="p">,</span>  <span class="n">filter_left_column</span><span class="p">)</span>
+
+				<span class="n">partial_match_not_match_df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">partial_match_not_match_df</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">partial_match_not_match_df_list</span><span class="p">:</span>
+			<span class="n">partial_match_not_match_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">partial_match_not_match_df_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+		<span class="c1"># 模糊匹配的因为涉及&quot;获取结果的字段名称&quot;可能会修改成原始字段名称，判断复杂, 故不做记录</span>
+	
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">partial_match_not_match_df</span>
+
+	<span class="c1"># 2.字段拆分</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">split_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">split_table_df</span><span class="p">):</span>
+
+		<span class="c1">#拆分字段,并做堆叠, 获取的配置格式 {&#39;拆分字段&#39;:[ 标准词组列表]} </span>
+		<span class="n">split_table_df</span> <span class="o">=</span> <span class="n">df_fillna_str</span><span class="p">(</span><span class="n">split_table_df</span><span class="p">)</span>
+		<span class="n">split_table_values</span> <span class="o">=</span> <span class="n">split_table_df</span><span class="o">.</span><span class="n">values</span>
+
+		<span class="n">split_config_dict</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">split_table_values</span><span class="p">:</span>
+			<span class="n">split_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">split_table_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="n">split_table_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+			<span class="n">filter_condition</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">split_mode</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+			<span class="n">split_symbol</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="n">split_table_column</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">split_table_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">split_column</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">:</span>
+
+				<span class="n">split_file_dict</span> <span class="o">=</span> <span class="n">get_require_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">require_file_dir</span><span class="p">,[</span><span class="n">split_table_name</span><span class="p">])</span>
+				<span class="n">split_file_path</span> <span class="o">=</span> <span class="n">split_file_dict</span><span class="p">[</span><span class="n">split_table_name</span><span class="p">]</span> 
+				<span class="n">split_standard_df</span> <span class="o">=</span> <span class="n">read_config_table</span><span class="p">(</span><span class="n">split_file_path</span><span class="p">)</span>
+				<span class="n">split_standard_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_standard_df</span><span class="o">.</span><span class="n">columns</span>  <span class="p">]</span>
+
+				<span class="k">if</span> <span class="n">filter_condition</span><span class="p">:</span>
+					<span class="n">split_standard_df</span> <span class="o">=</span> <span class="n">df_query</span><span class="p">(</span><span class="n">split_standard_df</span><span class="p">,</span> <span class="n">filter_condition</span><span class="p">)</span>
+				<span class="k">if</span> <span class="n">split_table_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">split_standard_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+					<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to find column &quot;</span><span class="si">{</span><span class="n">split_table_column</span><span class="si">}</span><span class="s1">&quot; in table &quot;</span><span class="si">{</span><span class="n">split_table_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">split_standard_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_standard_df</span><span class="p">[</span><span class="n">split_table_column</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span> 
+					<span class="n">split_standard_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">split_standard_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span> <span class="nb">len</span> <span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+				<span class="n">split_config_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">split_column</span><span class="p">:</span> <span class="p">[</span><span class="n">split_standard_list</span><span class="p">,</span> <span class="n">split_symbol</span> <span class="p">]})</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Standard column used to split is empty, &quot;</span><span class="si">{</span><span class="n">split_symbol</span><span class="si">}</span><span class="s1">&quot; will be the symbol used to split&#39;</span><span class="p">)</span>
+				<span class="n">split_config_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">split_column</span><span class="p">:[[],</span> <span class="n">split_symbol</span><span class="p">]</span> <span class="p">})</span>
+
+		<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">split_column_by_words</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">split_config_dict</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">split_mode</span><span class="p">)</span>
+
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">complete_header_df</span>
+
+	<span class="c1"># 3.字段匹配</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">match_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">match_table_df</span><span class="p">):</span>
+		<span class="n">table_values</span> <span class="o">=</span> <span class="n">df_fillna_str</span><span class="p">(</span><span class="n">match_table_df</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+
+		<span class="n">not_match_df_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">:</span>
+			<span class="n">source_columns</span> <span class="o">=</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># 目的表字段</span>
+			<span class="n">join_table_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># 关联表</span>
+			<span class="n">join_columns</span> <span class="o">=</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>    <span class="c1"># 关联字段</span>
+			<span class="n">target_columns</span> <span class="o">=</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>  <span class="c1"># 想获取的目标字段</span>
+			<span class="n">target_columns_edit</span> <span class="o">=</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>  <span class="c1"># 结果字段名称</span>
+			<span class="n">sort_order</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># 匹配前的去重排序</span>
+			<span class="n">replace_dict</span> <span class="o">=</span> <span class="n">get_replace_dict</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> 
+			<span class="n">filter_condition</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># 关联表过滤条件</span>
+			<span class="n">match_mode</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>  <span class="c1"># 匹配模式：1.case insensitive 2.case sensitive</span>
+			<span class="c1"># For columns with spaces in their name, you can use backtick quoting.</span>
+			
+			<span class="c1">#如果目标字段和重命名的目标字段 长度不等，直接全部改成所需要的字段名称</span>
+			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_columns_edit</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_columns</span><span class="p">)</span> <span class="p">:</span>
+				<span class="n">target_columns_edit</span> <span class="o">=</span> <span class="n">target_columns</span> 
+
+			<span class="k">if</span> <span class="n">source_columns</span> <span class="o">!=</span><span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">join_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="p">:</span>
+				<span class="c1">#如果两边的字段数量不一致</span>
+				<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">join_columns</span><span class="p">):</span>
+					<span class="n">min_num</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">source_columns</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">join_column</span><span class="p">)])</span>
+					<span class="n">source_columns</span> <span class="o">=</span> <span class="n">source_columns</span><span class="p">[:</span><span class="n">min_num</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+					<span class="n">join_columns</span> <span class="o">=</span> <span class="n">join_columns</span><span class="p">[:</span><span class="n">min_num</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+				<span class="c1">#如果填了匹配表，开始读取</span>
+				<span class="k">if</span> <span class="n">join_table_name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+					<span class="n">join_table_path</span> <span class="o">=</span> <span class="n">get_require_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">require_file_dir</span><span class="p">,</span> <span class="p">[</span><span class="n">join_table_name</span><span class="p">])[</span><span class="n">join_table_name</span><span class="p">]</span>
+					<span class="n">join_table_df</span> <span class="o">=</span> <span class="n">read_config_table</span><span class="p">(</span><span class="n">join_table_path</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span> <span class="c1">#如果没有填匹配表，则使用原始输入表格进行匹配</span>
+					<span class="n">join_table_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_complete_header_df</span>
+
+				<span class="c1"># 检查两张表 有没有字段缺失</span>
+				<span class="n">find_lack_columns</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">source_columns</span><span class="p">,</span><span class="s1">&#39;Matching, complete_header_df&#39;</span><span class="p">)</span>
+				<span class="n">find_lack_columns</span><span class="p">(</span><span class="n">join_table_df</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_columns</span> <span class="o">+</span> <span class="n">target_columns</span><span class="p">),</span> <span class="s1">&#39;Matching, join_table&#39;</span><span class="p">)</span>
+
+				<span class="n">join_table_df</span> <span class="o">=</span> <span class="n">process_join_table</span><span class="p">(</span><span class="n">join_table_df</span><span class="o">=</span><span class="n">join_table_df</span><span class="p">,</span> <span class="n">join_columns</span><span class="o">=</span><span class="n">join_columns</span><span class="p">,</span> 
+												   <span class="n">target_columns</span><span class="o">=</span><span class="n">target_columns</span><span class="p">,</span> <span class="n">filter_condition</span> <span class="o">=</span> <span class="n">filter_condition</span><span class="p">,</span> 
+												   <span class="n">sort_order</span> <span class="o">=</span> <span class="n">sort_order</span><span class="p">,</span> <span class="n">join_table_name</span> <span class="o">=</span> <span class="n">join_table_name</span><span class="p">)</span>
+
+				<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">process_match_complete_table</span><span class="p">(</span><span class="n">complete_header_df</span><span class="o">=</span> <span class="n">complete_header_df</span><span class="p">,</span> 
+																  <span class="n">source_columns</span> <span class="o">=</span> <span class="n">source_columns</span> <span class="p">,</span><span class="n">target_columns</span> <span class="o">=</span> <span class="n">target_columns</span><span class="p">,</span> 
+																  <span class="n">join_columns</span> <span class="o">=</span> <span class="n">join_columns</span><span class="p">,</span> <span class="n">join_table_name</span> <span class="o">=</span> <span class="n">join_table_name</span><span class="p">)</span>
+
+				<span class="c1">#重命名进行匹配，必须要做的，无论是否用的外部表匹配</span>
+				<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">source_columns</span><span class="p">)):</span>
+					<span class="n">join_table_df</span><span class="p">[</span><span class="n">source_columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">join_table_df</span><span class="p">[</span><span class="n">join_columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+				<span class="c1"># 防止只匹配表只有一列，并且只想获取该列结果</span>
+				<span class="n">join_table_df</span><span class="p">,</span> <span class="n">only_one_match_column</span> <span class="o">=</span> <span class="n">check_only_one_match_column</span><span class="p">(</span><span class="n">join_table_df</span><span class="p">,</span> <span class="n">join_columns</span><span class="p">,</span> <span class="n">target_columns</span> <span class="p">)</span>
+
+				<span class="c1"># 匹配默认忽略大小写</span>
+				<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">match_mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">match_mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;case sensitive&#39;</span><span class="p">:</span>
+					<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">join_table_df</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">source_columns</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">merge_case_insensitive</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">join_table_df</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">source_columns</span><span class="p">)</span>
+				<span class="k">if</span> <span class="n">only_one_match_column</span><span class="p">:</span>
+					<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s1">&#39;additional_temp&#39;</span><span class="p">:</span> <span class="n">target_columns_edit</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+				<span class="c1">#重命名，直接列表重新赋值即可</span>
+				<span class="k">if</span> <span class="n">target_columns_edit</span> <span class="o">!=</span> <span class="n">target_columns</span><span class="p">:</span>
+					<span class="k">for</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">target_columns</span><span class="p">,</span> <span class="n">target_columns_edit</span><span class="p">):</span>
+						<span class="n">complete_header_df</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span>
+
+				<span class="c1"># 记录无法匹配到结果的数据，第一个target_columns如果为空，判断为无法匹配</span>
+				<span class="n">not_match_df</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">complete_header_df</span><span class="p">[</span><span class="n">target_columns_edit</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="n">source_columns</span><span class="p">]</span>\
+				<span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+				<span class="n">not_match_df</span><span class="p">[</span><span class="s1">&#39;Content&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">not_match_df</span><span class="p">[</span><span class="n">source_columns</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+				<span class="n">not_match_df</span><span class="p">[</span><span class="s1">&#39;Matching field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_columns</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Match &#39;</span> <span class="o">+</span> <span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">join_columns</span><span class="p">)</span>
+
+				<span class="c1">#转换表头顺序</span>
+				<span class="n">shift_order_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">not_match_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+				<span class="n">not_match_df</span> <span class="o">=</span> <span class="n">not_match_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;Matching field&#39;</span><span class="p">,</span><span class="s1">&#39;Content&#39;</span><span class="p">]]</span>
+
+				<span class="n">not_match_df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">not_match_df</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">join_table_name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+			<span class="n">not_match_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">not_match_df_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+			<span class="n">not_match_df</span> <span class="o">=</span> <span class="n">not_match_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">not_match_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">not_match_df</span>
+
+	<span class="c1"># 4. 字段去重, 顺便生成MD5</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">drop_duplicate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">drop_duplicates_table_df</span><span class="p">):</span>
+		<span class="n">table_values</span> <span class="o">=</span> <span class="n">drop_duplicates_table_df</span><span class="o">.</span><span class="n">values</span>
+		<span class="n">drop_subset_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">md5_unique_column_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">:</span>
+			<span class="n">column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="n">if_drop_duplicate</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">if_gen_md5</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">if_drop_duplicate</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;是&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]:</span>
+					<span class="n">drop_subset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+				<span class="k">if</span> <span class="n">if_gen_md5</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;是&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]:</span>
+					<span class="n">md5_unique_column_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">enter_exit</span><span class="p">(</span>
+					<span class="sa">f</span><span class="s1">&#39;Deduplicate reference table error: Column &quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1">&quot; not found! &#39;</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">drop_subset_list</span><span class="p">:</span>
+			<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+				<span class="n">subset</span><span class="o">=</span><span class="n">drop_subset_list</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">md5_unique_column_list</span><span class="p">:</span>
+			<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">column_gen_md5</span><span class="p">(</span>
+				<span class="n">complete_header_df</span><span class="p">,</span> <span class="n">md5_unique_column_list</span><span class="p">,</span> <span class="s1">&#39;MD5&#39;</span><span class="p">)</span>
+
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">complete_header_df</span>
+
+	<span class="c1"># 5.填充排序</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">fill_and_sort_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">fill_and_sort_table</span><span class="p">):</span>
+		
+		<span class="n">table_values</span> <span class="o">=</span> <span class="n">fill_and_sort_table</span><span class="o">.</span><span class="n">values</span>
+		
+		<span class="n">source_columns</span> <span class="o">=</span> <span class="p">[</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">]</span>
+		<span class="n">complete_header_df_new</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+
+		<span class="n">seen_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+		<span class="n">sort_column_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">sort_column_order_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">dtype_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">:</span>
+			<span class="n">input_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="n">output_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="c1"># 输出的类型 日期类型--不包含时分秒 normalize().date 时间类型-包含时分秒-to_datetime, 和其他pandas支持的数据类型</span>
+			<span class="n">output_dtype</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="c1"># 先做内容替换，再做空值填充</span>
+			<span class="n">replace_value_str</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+			<span class="n">sort_value_str</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">fillna_value_str</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="n">input_column</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">output_column</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">input_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">complete_header_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+					<span class="n">if_skip</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
+						<span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">input_column</span><span class="si">}</span><span class="s1">&quot; not found in result table, thus not able to be mapped to the output result, continue?(Enter to continue)&#39;</span><span class="p">)</span>
+					<span class="k">if</span> <span class="n">if_skip</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">if_skip</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span> <span class="ow">or</span> <span class="n">if_skip</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+						<span class="k">continue</span>
+					<span class="k">else</span><span class="p">:</span>
+						<span class="n">enter_exit</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+				<span class="c1">#先将旧数据赋值到新数据 , 如果是重复填入的则保持用complete_header_df_new的数据处理即可</span>
+				<span class="k">if</span> <span class="n">input_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_columns</span><span class="p">:</span>
+					<span class="n">complete_header_df_new</span><span class="p">[</span><span class="n">output_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="p">[</span><span class="n">input_column</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+					<span class="n">seen_columns</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">input_column</span><span class="p">)</span>
+					
+				<span class="k">if</span> <span class="n">input_column</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">output_column</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">replace_value_str</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+						<span class="n">complete_header_df_new</span> <span class="o">=</span> <span class="n">replace_value_func</span><span class="p">(</span>
+							<span class="n">complete_header_df_new</span><span class="p">,</span> <span class="n">replace_value_str</span><span class="p">,</span> <span class="n">input_column</span><span class="p">,</span> <span class="n">output_column</span><span class="p">)</span>
+
+					<span class="c1"># 过滤： 以下全部沿用上面获得的complete_header_df_new和他的所有output_column</span>
+					<span class="k">if</span> <span class="n">fillna_value_str</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+						<span class="k">for</span> <span class="n">fillna_value_str_x</span> <span class="ow">in</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">fillna_value_str</span><span class="p">):</span>
+							<span class="n">complete_header_df_new</span> <span class="o">=</span> <span class="n">fillna_value_func</span><span class="p">(</span>
+								<span class="n">complete_header_df</span><span class="p">,</span> <span class="n">complete_header_df_new</span><span class="p">,</span> <span class="n">fillna_value_str_x</span><span class="p">,</span> <span class="n">output_column</span><span class="p">)</span>
+					<span class="c1"># 排序：统一加到列表，统一排序, 通过正-顺序，负数-倒序，数字代表是优先第几sort的顺序</span>
+					<span class="k">if</span> <span class="n">sort_value_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+						<span class="k">try</span><span class="p">:</span>
+							<span class="n">sort_value_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">sort_value_str</span><span class="p">))</span>
+							<span class="n">sort_column_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_column</span><span class="p">)</span>
+							<span class="n">sort_column_order_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sort_value_number</span><span class="p">)</span>
+						<span class="k">except</span><span class="p">:</span>
+							<span class="k">pass</span>
+					<span class="c1"># 输出类型：</span>
+					<span class="k">if</span> <span class="n">output_dtype</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+						<span class="n">dtype_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">output_column</span><span class="p">:</span> <span class="n">output_dtype</span><span class="p">})</span>
+
+		<span class="n">complete_header_df_new</span> <span class="o">=</span> <span class="n">dtype_handle</span><span class="p">(</span>
+			<span class="n">complete_header_df_new</span><span class="p">,</span> <span class="n">dtype_dict</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+			
+		<span class="k">if</span> <span class="n">sort_column_list</span><span class="p">:</span>
+			<span class="n">complete_header_df_new</span> <span class="o">=</span> <span class="n">sort_value_func</span><span class="p">(</span>
+				<span class="n">complete_header_df_new</span><span class="p">,</span> <span class="n">sort_column_list</span><span class="p">,</span> <span class="n">sort_column_order_list</span><span class="p">)</span>
+
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">complete_header_df_new</span>
+
+	<span class="c1"># 6.条件过滤</span>
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">filter_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">filter_condition_table</span><span class="p">):</span>
+
+		<span class="n">table_values</span> <span class="o">=</span> <span class="n">filter_condition_table</span><span class="o">.</span><span class="n">values</span>
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">:</span>
+			<span class="n">condition</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+			<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">df_query</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
+
+		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data rows:</span><span class="si">{</span><span class="n">complete_header_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">complete_header_df</span>
+
+	<span class="nd">@get_run_time</span>
+	<span class="k">def</span> <span class="nf">regex_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complete_header_df</span><span class="p">,</span> <span class="n">regex_extraction_table</span><span class="p">):</span>
+
+		<span class="n">table_values</span> <span class="o">=</span> <span class="n">regex_extraction_table</span><span class="o">.</span><span class="n">values</span>
+
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table_values</span><span class="p">:</span>
+			<span class="n">source_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">output_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="n">extract_pattten</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+			<span class="n">find_lack_columns</span><span class="p">(</span><span class="n">complete_header_df</span><span class="p">,</span> <span class="p">[</span><span class="n">source_column</span><span class="p">])</span>
+
+			<span class="k">if</span> <span class="n">source_column</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">extract_pattten</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+				<span class="n">complete_header_df</span><span class="p">[</span><span class="n">output_column</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+				<span class="n">complete_header_df</span><span class="p">[</span><span class="n">output_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_header_df</span><span class="p">[</span><span class="n">source_column</span><span class="p">]</span>\
+				<span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">extract_pattten</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">complete_header_df</span>
+
+
+	<span class="c1">#***************以下是数据统计的函数***************************#</span>
+
+	<span class="c1">#如果配置表有时间的处理的部分，传入需要计算的时间周期</span>
+<div class="viewcode-block" id="Handler.calc_time"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.data_handle_sheet_func.Handler.calc_time">[文档]</a>	<span class="k">def</span> <span class="nf">calc_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df</span><span class="p">,</span><span class="n">time_process_df</span><span class="p">):</span>
+
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">time_process_df</span><span class="o">.</span><span class="n">empty</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">data_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+
+			<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">time_process_df</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+				<span class="n">time_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+				<span class="n">enddate</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+				<span class="n">original_period</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+				<span class="n">period</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+				<span class="c1">#获取时间范围对应的统计截止时间, 如果输入的是原始数据表格的字段，将该字段转成时间格式</span>
+				<span class="k">if</span> <span class="n">enddate</span> <span class="ow">in</span> <span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+					<span class="n">data_df</span> <span class="o">=</span> <span class="n">normalize_column_dates</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span><span class="n">enddate</span><span class="p">)</span>
+					<span class="n">enddate</span> <span class="o">=</span> <span class="n">data_df</span><span class="p">[</span><span class="n">enddate</span><span class="p">]</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">enddate</span> <span class="o">=</span> <span class="n">normalize_dates_single</span><span class="p">(</span><span class="n">enddate</span><span class="p">)</span>
+
+				<span class="c1">#获取需要统计的时间区间</span>
+				<span class="n">re_result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^([a-zA-Z</span><span class="se">\u4e00</span><span class="s1">-</span><span class="se">\u9fa5</span><span class="s1">]{1,}).?(\d{1,})$&#39;</span><span class="p">,</span><span class="n">original_period</span><span class="p">)</span>
+
+				<span class="c1">#确保输入的时间区间格式</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">period</span> <span class="o">=</span> <span class="n">re_result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+					<span class="n">period_number</span> <span class="o">=</span> <span class="n">re_result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+				<span class="k">except</span><span class="p">:</span>
+					<span class="n">enter_exit</span><span class="p">(</span><span class="s1">&#39;Time range input error: Make sure the input time range is like day_1, day_2, week_1, etc&#39;</span><span class="p">)</span>
+
+				<span class="k">if</span> <span class="n">time_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+					<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Time process error: Missing column:</span><span class="si">{</span><span class="n">time_column</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+				<span class="c1">#将原始时间字段转成时间格式  </span>
+				<span class="n">data_df</span> <span class="o">=</span> <span class="n">normalize_column_dates</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span> <span class="n">time_column</span><span class="p">)</span>
+
+				<span class="c1">#用截止时间来计算时间不同的维度，day, week , month, year</span>
+				<span class="c1">#使用np.timedelta64来计算 需要将日期转成pandas to_datetime的日期格式</span>
+				<span class="k">if</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">,</span><span class="s1">&#39;days&#39;</span><span class="p">,</span><span class="s1">&#39;天&#39;</span><span class="p">,</span><span class="s1">&#39;日&#39;</span><span class="p">,</span><span class="s1">&#39;d&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;week&#39;</span><span class="p">,</span><span class="s1">&#39;weeks&#39;</span><span class="p">,</span> <span class="s1">&#39;周&#39;</span><span class="p">,</span><span class="s1">&#39;星期&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;W&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="s1">&#39;月&#39;</span><span class="p">,</span><span class="s1">&#39;月数&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="s1">&#39;years&#39;</span><span class="p">,</span> <span class="s1">&#39;年&#39;</span><span class="p">,</span><span class="s1">&#39;年数&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;hour&#39;</span><span class="p">,</span><span class="s1">&#39;hours&#39;</span><span class="p">,</span> <span class="s1">&#39;时&#39;</span><span class="p">,</span><span class="s1">&#39;小时&#39;</span><span class="p">,</span><span class="s1">&#39;h&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;h&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;minute&#39;</span><span class="p">,</span><span class="s1">&#39;minutes&#39;</span><span class="p">,</span> <span class="s1">&#39;分&#39;</span><span class="p">,</span><span class="s1">&#39;分钟&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;sales week&#39;</span><span class="p">,</span> <span class="s1">&#39;sales weeks&#39;</span><span class="p">,</span><span class="s1">&#39;实销周&#39;</span><span class="p">,</span><span class="s1">&#39;实销周数&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;W&#39;</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">period</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;sales month&#39;</span><span class="p">,</span><span class="s1">&#39;sales months&#39;</span><span class="p">,</span><span class="s1">&#39;实销月&#39;</span><span class="p">,</span><span class="s1">&#39;实销月数&#39;</span><span class="p">]:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">enddate</span> <span class="o">-</span> <span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">period_number</span><span class="p">,</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown time period:</span><span class="si">{</span><span class="n">original_period</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+				<span class="c1">#再检查一次时间是否完整</span>
+				<span class="n">data_df_empty_date</span> <span class="o">=</span> <span class="n">data_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),:]</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">data_df_empty_date</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+					<span class="n">enter_exit</span><span class="p">(</span><span class="s1">&#39;Time process error: column &quot;</span><span class="si">{}</span><span class="s1">&quot; has </span><span class="si">{}</span><span class="s1"> empty datetime rows after combining all the data files!&#39;</span>\
+						<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_column</span><span class="p">,</span><span class="n">data_df_empty_date</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+				<span class="c1">#往上取整，统一转成int格式</span>
+				<span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_df</span><span class="p">[</span><span class="n">original_period</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+				<span class="c1">#将结果转成True和False,因为后面统计不能用数字结果去做分组, 结果为1的就是属于填入的时间区间</span>
+				<span class="c1"># data_df[original_period] = data_df[original_period].apply(lambda x: True if x==1 else False)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">data_df</span> 
+		<span class="k">return</span> <span class="n">data_df</span></div>
+
+	<span class="nd">@catch_and_print</span>
+	<span class="k">def</span> <span class="nf">process_statistic_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df</span><span class="p">,</span> <span class="n">statistic_groups_df</span><span class="p">):</span>
+
+		<span class="c1">#防止读取的透视字段是合并的单元格</span>
+		<span class="n">group_column</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">statistic_groups_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="n">statistic_groups_df</span><span class="p">[</span><span class="n">group_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">statistic_groups_df</span><span class="p">[</span><span class="n">group_column</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;Nan&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">)</span>
+
+		<span class="n">values</span> <span class="o">=</span> <span class="n">statistic_groups_df</span><span class="o">.</span><span class="n">values</span>
+
+		<span class="n">groups</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span><span class="s1">&#39;&#39;</span><span class="p">])))</span>
+		<span class="c1"># #防止有过滤条件的聚合之后 部分主键丢失导致无法做skipna的计算功能</span>
+		<span class="n">agg_df_sub</span> <span class="o">=</span> <span class="n">generate_complete_index</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span><span class="n">groups</span><span class="p">)</span>
+
+		<span class="n">temp_df_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">agg_df_sub</span> <span class="p">]</span>
+
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+			<span class="n">filter_condition</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">drop_duplicates_condition</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="n">groups_str</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+			<span class="n">groups</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span><span class="s1">&#39;&#39;</span><span class="p">])))</span>
+			<span class="n">value_column</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">agg_func</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+			<span class="n">result_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+
+			<span class="k">if</span> <span class="n">value_column</span> <span class="p">:</span>
+				<span class="c1">#检查是否少字段</span>
+				<span class="n">lack_column_list</span> <span class="o">=</span> <span class="n">find_lack_columns</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="s1">&#39;Grouping error&#39;</span><span class="p">)</span>
+				<span class="c1">#过滤和去重</span>
+				<span class="n">data_df_sub</span> <span class="o">=</span> <span class="n">df_query</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span><span class="n">filter_condition</span><span class="p">)</span>
+				<span class="n">data_df_sub</span> <span class="o">=</span> <span class="n">process_duplicates</span><span class="p">(</span><span class="n">data_df_sub</span><span class="p">,</span> <span class="n">drop_duplicates_condition</span><span class="p">)</span>
+
+				<span class="k">if</span> <span class="s1">&#39;word&#39;</span> <span class="ow">in</span>  <span class="n">agg_func</span><span class="p">:</span> <span class="c1">#如果为空 返回空字典</span>
+					<span class="k">if</span> <span class="n">data_df_sub</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span> 
+						<span class="n">agg_df_sub</span> <span class="o">=</span> <span class="n">create_group_empty</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">value_column</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span>
+					<span class="k">else</span><span class="p">:</span>
+						<span class="n">require_file_dict</span> <span class="o">=</span> <span class="n">get_require_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">require_file_dir</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">,</span><span class="s1">&#39;stop_word&#39;</span><span class="p">])</span>
+						<span class="n">keyword_dict</span><span class="p">,</span> <span class="n">keyword_format_dict</span> <span class="o">=</span> <span class="n">get_keyword_dict</span><span class="p">(</span><span class="n">require_file_dict</span><span class="p">[</span><span class="s1">&#39;keyword&#39;</span><span class="p">])</span>
+						<span class="n">stopword_dict</span><span class="p">,</span> <span class="n">stopword_format_dict</span> <span class="o">=</span> <span class="n">get_keyword_dict</span><span class="p">(</span><span class="n">require_file_dict</span><span class="p">[</span><span class="s1">&#39;stop_word&#39;</span><span class="p">])</span>
+
+						<span class="n">keyword_list</span> <span class="o">=</span> <span class="n">convert_key2list</span><span class="p">(</span><span class="n">keyword_dict</span><span class="p">)</span>
+						<span class="n">stopword_list</span> <span class="o">=</span> <span class="n">convert_key2list</span><span class="p">(</span><span class="n">stopword_dict</span><span class="p">)</span> 
+						<span class="c1">#词频统计需要传入关键词字典</span>
+						<span class="n">agg_df_sub</span> <span class="o">=</span> <span class="n">group_basic_agg</span><span class="p">(</span><span class="n">data_df_sub</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span>  <span class="n">agg_func</span><span class="p">,</span> 
+											<span class="n">value_column</span><span class="p">,</span><span class="n">keyword_list</span><span class="p">,</span><span class="n">stopword_list</span><span class="p">,</span><span class="n">group_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">data_df_sub</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+						<span class="n">agg_df_sub</span> <span class="o">=</span> <span class="n">create_group_empty</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">value_column</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="mi">0</span> <span class="p">)</span>
+					<span class="k">else</span><span class="p">:</span>
+						<span class="n">agg_df_sub</span> <span class="o">=</span> <span class="n">group_basic_agg</span><span class="p">(</span><span class="n">data_df_sub</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span>  <span class="n">agg_func</span><span class="p">,</span> <span class="n">value_column</span><span class="p">,</span><span class="n">group_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+				<span class="n">agg_df_sub</span> <span class="o">=</span> <span class="n">agg_df_sub</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">value_column</span><span class="p">:</span><span class="n">result_name</span><span class="p">},</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+				<span class="n">temp_df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">agg_df_sub</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">temp_df_list</span> <span class="p">:</span>
+			<span class="n">agg_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">temp_df_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+		<span class="n">agg_df</span> <span class="o">=</span> <span class="n">agg_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+		<span class="k">return</span> <span class="n">agg_df</span>
+
+	<span class="nd">@catch_and_print</span>
+	<span class="k">def</span> <span class="nf">process_calculations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df</span><span class="p">,</span> <span class="n">calculation_df</span><span class="p">):</span>
+		<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span> 
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">calculation_df</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+			<span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span> 
+			<span class="n">calc_content</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+			<span class="n">result_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="k">if</span> <span class="n">calc_content</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">data_df</span><span class="p">[</span><span class="n">result_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">calc_content</span><span class="p">)</span>
+				<span class="k">except</span> <span class="p">:</span>
+					<span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Calculation Error on row </span><span class="si">{</span><span class="n">counter</span><span class="si">}</span><span class="s1">, </span><span class="se">\n</span><span class="s1"> Content:</span><span class="si">{</span><span class="n">calc_content</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">data_df</span>
+
+	<span class="nd">@catch_and_print</span>
+	<span class="k">def</span> <span class="nf">pivot_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_df</span><span class="p">,</span> <span class="n">pivot_table_df</span><span class="p">):</span>
+		<span class="c1">#只读取第一行</span>
+		<span class="n">row_counter</span> <span class="o">=</span> <span class="mi">0</span>  
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">pivot_table_df</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+			<span class="n">row_counter</span> <span class="o">+=</span> <span class="mi">1</span> 
+			<span class="k">if</span> <span class="nb">all</span><span class="p">([</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">])</span> <span class="p">:</span>
+				<span class="n">index</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span> 
+				<span class="n">columns</span> <span class="o">=</span>  <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span> 
+				<span class="n">values</span> <span class="o">=</span>  <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_colon</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span> 
+				<span class="c1">#检查所有字段</span>
+				<span class="n">find_lack_columns</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="n">columns</span> <span class="o">+</span> <span class="n">values</span><span class="p">)</span>
+				<span class="n">data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">data_df</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span>
+
+				<span class="c1">#如果得到的结果有多个表头，只保留最后一行表头</span>
+				<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">):</span>
+					<span class="k">try</span><span class="p">:</span> <span class="c1"># index error will occur if df is empty</span>
+						<span class="n">level_elem</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+						<span class="n">drop_len</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level_elem</span><span class="p">)</span> <span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> 
+					<span class="k">except</span><span class="p">:</span>
+						<span class="n">drop_len</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+					<span class="n">data_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">drop_len</span><span class="p">)</span>
+
+				<span class="n">data_df</span> <span class="o">=</span> <span class="n">data_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">data_df</span> </div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

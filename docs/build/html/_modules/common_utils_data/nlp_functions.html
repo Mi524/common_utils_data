@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.nlp_functions &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.nlp_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.nlp_functions 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span> 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">.regex_functions</span> <span class="kn">import</span> <span class="n">replace_punctuations</span> <span class="p">,</span> <span class="n">replace_re_special</span><span class="p">,</span> <span class="n">get_keyword_pat</span>
+<span class="kn">from</span> <span class="nn">.os_functions</span> <span class="kn">import</span> <span class="n">enter_exit</span>
+<span class="kn">import</span> <span class="nn">xlrd</span> 
+
+<div class="viewcode-block" id="convert_key2list"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.convert_key2list">[文档]</a><span class="k">def</span> <span class="nf">convert_key2list</span><span class="p">(</span><span class="n">word_dict</span><span class="p">):</span>
+    <span class="n">word_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">word_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">v</span> <span class="p">:</span>
+            <span class="n">word_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">word_list</span></div>
+
+<div class="viewcode-block" id="get_keyword_dict"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.get_keyword_dict">[文档]</a><span class="k">def</span> <span class="nf">get_keyword_dict</span><span class="p">(</span><span class="n">path_list</span><span class="p">):</span>
+    <span class="c1">#保存每个关键词列所需颜色的文字</span>
+    <span class="n">keyword_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="c1">#保存每个关键词列 类别的数字</span>
+    <span class="n">keyword_format_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">path_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">path_list</span> <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">path_list</span><span class="p">:</span>
+        <span class="n">wb</span> <span class="o">=</span> <span class="n">xlrd</span><span class="o">.</span><span class="n">open_workbook</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="c1">#sheet name传入颜色</span>
+        <span class="n">sheet_names</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">sheet_names</span><span class="p">:</span>
+            <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">sheet_by_name</span><span class="p">(</span><span class="n">sn</span><span class="p">)</span>
+            <span class="c1">#表头,根据表头获取应该写入红色还是蓝色，还是粗体</span>
+            <span class="n">header_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">header</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">)</span> <span class="p">:</span>
+                        <span class="n">header</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1">#为了防止两列中间隔一个空的表头单元格</span>
+                        <span class="n">header</span> <span class="o">=</span> <span class="kc">None</span>
+
+                    <span class="k">if</span> <span class="n">header</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">header_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">header_list</span><span class="p">:</span>
+                    <span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error when reading keywords:</span><span class="se">\n</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">-&quot;</span><span class="si">{</span><span class="n">sn</span><span class="si">}</span><span class="s1">&quot; should have at least one table header(keyword column names).&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="n">enter_exit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error when reading keywords:</span><span class="se">\n</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">-&quot;</span><span class="si">{</span><span class="n">sn</span><span class="si">}</span><span class="s1">&quot; should have at least one table header(keyword column names).&#39;</span><span class="p">)</span>
+
+            <span class="n">seen_keywords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">get_rows</span><span class="p">())[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">format_word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header_list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">format_word</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">keyword_value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> 
+                        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span> <span class="o">==</span> <span class="n">keyword_value</span><span class="p">:</span>
+                            <span class="n">keyword</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1">#必须去掉容易导致歧义的特殊符号</span>
+                            <span class="n">keyword</span> <span class="o">=</span> <span class="n">replace_re_special</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+                        <span class="k">if</span> <span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_keywords</span> <span class="ow">and</span> <span class="n">keyword</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="p">:</span>
+                            <span class="n">keyword_dict</span><span class="p">[</span><span class="n">format_word</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+
+                            <span class="n">seen_keywords</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+
+            <span class="c1">#记录将每个颜色对应的关键词类</span>
+            <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">h</span> <span class="o">!=</span> <span class="kc">None</span> <span class="p">:</span>
+                    <span class="n">keyword_format_dict</span><span class="p">[</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> 
+
+        <span class="n">wb</span><span class="o">.</span><span class="n">release_resources</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">keyword_dict</span><span class="p">,</span> <span class="n">keyword_format_dict</span></div>
+
+<div class="viewcode-block" id="get_stopword_list"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.get_stopword_list">[文档]</a><span class="k">def</span> <span class="nf">get_stopword_list</span><span class="p">(</span><span class="n">stopwords_path</span><span class="p">):</span>
+
+    <span class="n">stopword_list</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">with</span>  <span class="nb">open</span><span class="p">(</span><span class="n">stopwords_path</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">stopwords</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> 
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stopwords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">stopword_list</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">stopword_list</span></div>
+
+<div class="viewcode-block" id="process_text_eng"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.process_text_eng">[文档]</a><span class="k">def</span> <span class="nf">process_text_eng</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">keyword_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">stopword_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">count_keywords_only</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="c1">#仅适用英文</span>
+    
+    <span class="c1">#需要确保每个单词两边有空格</span>
+    <span class="n">keyword_list</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keyword_list</span> <span class="p">]</span>
+
+    <span class="c1">#加密邮件和数字</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">encript_email_pat</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">encript_number_pat</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">replace_punctuations</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">replace_to_symbol</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;@&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="n">text_list</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="c1">#split空格，去掉多空格，再重新组合，为了匹配单词的两边空格，text两边也要加上空格</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+
+    <span class="c1">#keyword_dict先加入本身就是单词的词组，再组合成regex里面的格式拆分</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">count_keywords_only</span> <span class="ow">and</span> <span class="n">keyword_list</span><span class="p">:</span>
+        <span class="n">keyword_list</span> <span class="o">=</span> <span class="n">keyword_list</span> <span class="o">+</span> <span class="n">text_list</span>
+
+    <span class="c1">#英文的处理，关键词搜索两边加上空格确保搜到的是英文</span>
+    <span class="n">keyword_pat</span> <span class="o">=</span> <span class="n">get_keyword_pat</span><span class="p">(</span><span class="n">keyword_list</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">count_keywords_only</span><span class="p">:</span>
+        <span class="n">text_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">keyword_pat</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">text_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword_pat</span><span class="p">,</span><span class="n">text</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">text_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">text_list</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span> 
+
+    <span class="n">text_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">text_list</span> <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">stopword_list</span><span class="p">:</span>
+        <span class="n">text_list</span> <span class="o">=</span> <span class="n">remove_stopwords</span><span class="p">(</span><span class="n">stopword_list</span><span class="p">,</span> <span class="n">text_list</span><span class="p">)</span>
+
+    <span class="n">text_list</span> <span class="o">=</span> <span class="n">remove_numbers</span><span class="p">(</span><span class="n">text_list</span><span class="p">)</span>
+    <span class="n">text_list</span> <span class="o">=</span> <span class="n">remove_one_letter</span><span class="p">(</span><span class="n">text_list</span><span class="p">)</span>
+
+    <span class="n">text_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">text_list</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">text_list</span></div>
+
+<div class="viewcode-block" id="get_word_freq_dict"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.get_word_freq_dict">[文档]</a><span class="k">def</span> <span class="nf">get_word_freq_dict</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">keyword_list</span><span class="p">,</span> <span class="n">stopword_list</span><span class="p">,</span> <span class="n">count_keywords_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">word_num</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+
+    <span class="n">text_list</span> <span class="o">=</span> <span class="n">process_text_eng</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="n">keyword_list</span><span class="p">,</span><span class="n">stopword_list</span><span class="p">,</span> <span class="n">count_keywords_only</span><span class="o">=</span><span class="n">count_keywords_only</span> <span class="p">)</span>
+
+    <span class="n">word_count</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">text_list</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">word_num</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">word_count</span></div>
+
+<div class="viewcode-block" id="remove_stopwords"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.remove_stopwords">[文档]</a><span class="k">def</span> <span class="nf">remove_stopwords</span><span class="p">(</span><span class="n">stopword_list</span><span class="p">,</span> <span class="n">word_list</span><span class="p">):</span>
+
+    <span class="c1">#转成字典再处理,尽量避免用 in list 的方式搜索</span>
+    <span class="n">stopword_dict</span> <span class="o">=</span> <span class="p">{</span> <span class="n">s</span> <span class="p">:</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stopword_list</span> <span class="p">}</span>
+    <span class="n">new_word_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stopword_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_word_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">new_word_list</span></div>
+
+<div class="viewcode-block" id="remove_numbers"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.remove_numbers">[文档]</a><span class="k">def</span> <span class="nf">remove_numbers</span><span class="p">(</span><span class="n">word_list</span><span class="p">):</span>
+    <span class="n">word_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">word_list</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">word_list</span></div>
+
+
+
+
+<div class="viewcode-block" id="remove_one_letter"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.remove_one_letter">[文档]</a><span class="k">def</span> <span class="nf">remove_one_letter</span><span class="p">(</span><span class="n">word_list</span><span class="p">):</span>
+    <span class="n">word_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">word_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="n">word_list</span></div>
+
+<div class="viewcode-block" id="encript_email_pat"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.encript_email_pat">[文档]</a><span class="k">def</span> <span class="nf">encript_email_pat</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">email_like_pat</span> <span class="o">=</span> <span class="s1">&#39;([a-z0-9]{5,30})(@[^</span><span class="se">\u4e00</span><span class="s1">-</span><span class="se">\u9fa5</span><span class="s1">]+\.[a-z0-9]{2,15})&#39;</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">if_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">email_like_pat</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">if_match</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">email_like_pat</span><span class="p">,</span><span class="n">repl</span><span class="o">=</span><span class="s1">&#39;*****\g&lt;2&gt;&#39;</span><span class="p">,</span><span class="n">string</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">text</span></div>
+
+<div class="viewcode-block" id="encript_number_pat"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.nlp_functions.encript_number_pat">[文档]</a><span class="k">def</span> <span class="nf">encript_number_pat</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">number_counter</span> <span class="o">=</span> <span class="mi">0</span> 
+
+        <span class="n">new_text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">new_text</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">()</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">number_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">number_counter</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="p">:</span>
+                    <span class="n">result</span> <span class="o">+=</span> <span class="s1">&#39;*&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">+=</span> <span class="n">c</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">number_counter</span> <span class="o">=</span> <span class="mi">0</span> 
+                <span class="n">result</span> <span class="o">+=</span> <span class="n">c</span>   
+                
+        <span class="c1">#判断是否纯数字，如果是，后面需要rstrip(&#39;.0&#39;)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span> <span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.0&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span> 
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

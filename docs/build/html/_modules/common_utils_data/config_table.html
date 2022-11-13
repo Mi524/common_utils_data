@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.config_table &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.config_table</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.config_table 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">gc</span> 
+<span class="kn">import</span> <span class="nn">re</span> 
+<span class="kn">import</span> <span class="nn">sys</span>  
+<span class="kn">import</span> <span class="nn">warnings</span> 
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">time</span>  
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> 
+<span class="kn">import</span> <span class="nn">warnings</span>  
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter</span> <span class="kn">import</span> <span class="n">Workbook</span> 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span><span class="n">Counter</span>
+
+<span class="kn">from</span> <span class="nn">.os_functions</span> <span class="kn">import</span> <span class="n">get_walk_files</span><span class="p">,</span><span class="n">get_walk_abs_files</span><span class="p">,</span>\
+<span class="n">check_require_files</span><span class="p">,</span><span class="n">check_create_new_folder</span><span class="p">,</span><span class="n">get_require_files</span><span class="p">,</span><span class="n">enter_exit</span>
+<span class="kn">from</span> <span class="nn">.df_functions</span> <span class="kn">import</span> <span class="n">normalize_multi_header</span><span class="p">,</span><span class="n">copy_seperate_header_columns</span><span class="p">,</span>\
+<span class="n">check_abnormal_dates</span><span class="p">,</span> <span class="n">stack_list_column</span><span class="p">,</span> <span class="n">df_fillna_str</span>
+<span class="kn">from</span> <span class="nn">.excel_functions</span> <span class="kn">import</span> <span class="n">write_pct_columns</span>
+
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">pandas.core.index</span> <span class="kn">import</span> <span class="n">MultiIndex</span>
+
+<div class="viewcode-block" id="ConfigReader"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.config_table.ConfigReader">[文档]</a><span class="k">class</span> <span class="nc">ConfigReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config_file_dir</span><span class="p">,</span> <span class="n">config_table_name</span><span class="p">,</span> <span class="n">config_list</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">config_file_dir</span> <span class="o">=</span> <span class="n">config_file_dir</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">config_table_name</span> <span class="o">=</span> <span class="n">config_table_name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">config_list</span> <span class="o">=</span> <span class="n">config_list</span> 
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">require_file_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;require_file_dir&#39;</span><span class="p">,</span><span class="s1">&#39;.</span><span class="se">\\</span><span class="s1">require_tables&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">data_file_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_file_dir&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">data_files&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigReader.get_header_table"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.config_table.ConfigReader.get_header_table">[文档]</a>	<span class="k">def</span> <span class="nf">get_header_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">header_table_df</span><span class="p">):</span>
+		<span class="c1">#过滤全都是空的行</span>
+		<span class="n">header_table_df</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+		<span class="n">header_table_df</span> <span class="o">=</span> <span class="n">df_fillna_str</span><span class="p">(</span><span class="n">header_table_df</span><span class="p">)</span>
+		<span class="n">header_table_df</span> <span class="o">=</span>  <span class="n">normalize_multi_header</span><span class="p">(</span><span class="n">header_table_df</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">header_table_df</span></div>
+
+<div class="viewcode-block" id="ConfigReader.get_complete_header_df"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.config_table.ConfigReader.get_complete_header_df">[文档]</a>	<span class="k">def</span> <span class="nf">get_complete_header_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header_table_df</span><span class="p">):</span>
+		<span class="c1">#保留的标准表头数量 以第一列的序号为准</span>
+		<span class="n">header_table_columns</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="o">.</span><span class="n">columns</span>
+		<span class="n">standard_column</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="p">[</span><span class="n">header_table_columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+		<span class="n">standard_column</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">standard_column</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+
+		<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">standard_column</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span>
+			<span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+				<span class="n">standard_column</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">break</span>
+
+		<span class="n">target_column_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">standard_column</span><span class="p">)</span>
+		<span class="n">target_cn_columns</span> <span class="o">=</span> <span class="n">header_table_df</span><span class="p">[</span><span class="n">header_table_columns</span><span class="p">[</span><span class="mi">2</span><span class="p">]][:</span><span class="n">target_column_num</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+		<span class="n">complete_header_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span> <span class="p">[],</span><span class="n">columns</span><span class="o">=</span><span class="n">target_cn_columns</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">complete_header_df</span><span class="p">,</span><span class="n">target_cn_columns</span> </div>
+
+<div class="viewcode-block" id="ConfigReader.get_config_tables"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.config_table.ConfigReader.get_config_tables">[文档]</a>	<span class="k">def</span> <span class="nf">get_config_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">if_walk_path</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">):</span>
+
+		<span class="n">require_file_dict</span> <span class="o">=</span> <span class="n">get_require_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_table_name</span><span class="p">,</span><span class="n">if_walk_path</span><span class="o">=</span><span class="n">if_walk_path</span><span class="p">)</span>
+
+		<span class="n">header_table_path</span> <span class="o">=</span> <span class="n">require_file_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config_table_name</span><span class="p">]</span>
+		
+		<span class="n">df_workbook</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">header_table_path</span><span class="p">)</span>
+
+		<span class="n">sheet_property_list</span> <span class="o">=</span> <span class="n">df_workbook</span><span class="o">.</span><span class="n">book</span><span class="o">.</span><span class="n">sheets</span><span class="p">()</span>
+
+		<span class="n">table_dict</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+		<span class="k">for</span> <span class="n">sheet_property</span> <span class="ow">in</span> <span class="n">sheet_property_list</span><span class="p">:</span>
+			<span class="n">sheet</span> <span class="o">=</span> <span class="n">sheet_property</span><span class="o">.</span><span class="n">name</span>
+
+			<span class="n">sheet_visibility</span> <span class="o">=</span> <span class="n">sheet_property</span><span class="o">.</span><span class="n">visibility</span>
+
+			<span class="k">if</span> <span class="n">sheet_visibility</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>  <span class="c1">#只读取可见的sheet</span>
+				<span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_list</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">sheet</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+						<span class="c1">#需要特殊处理的合并表</span>
+						<span class="k">if</span> <span class="s1">&#39;mapping&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+							<span class="n">table</span> <span class="o">=</span> <span class="n">df_workbook</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+							<span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+							<span class="n">complete_header_df</span><span class="p">,</span> <span class="n">target_cn_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_complete_header_df</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+						<span class="k">else</span><span class="p">:</span>
+							<span class="n">table</span> <span class="o">=</span> <span class="n">df_workbook</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span>
+
+						<span class="k">if</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+							<span class="n">table</span> <span class="o">=</span> <span class="n">df_fillna_str</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+							<span class="n">table_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">sheet</span><span class="p">:</span><span class="n">table</span><span class="p">})</span>
+
+		<span class="n">table_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s1">&#39;complete_header_df&#39;</span> <span class="p">:</span><span class="n">complete_header_df</span><span class="p">,</span>
+							<span class="s1">&#39;target_cn_columns&#39;</span><span class="p">:</span><span class="n">target_cn_columns</span> <span class="p">})</span>
+
+		<span class="k">return</span> <span class="n">table_dict</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+	<span class="n">config_list</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;mapping&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;standardization&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;split&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;match&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;deduplication&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;fill&amp;sort&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;filter&#39;</span><span class="p">,</span>
+					<span class="s1">&#39;extraction&#39;</span><span class="p">]</span>
+
+
+	<span class="n">config_list</span> <span class="o">=</span><span class="p">[</span> <span class="s1">&#39;mapping&#39;</span><span class="p">,</span>
+				   <span class="s1">&#39;time process&#39;</span><span class="p">,</span>
+				   <span class="s1">&#39;statistic groups&#39;</span><span class="p">,</span>
+				   <span class="s1">&#39;calculations&#39;</span><span class="p">,</span>
+				   <span class="s1">&#39;fill&amp;sort&#39;</span><span class="p">]</span>
+
+	<span class="n">table_reader</span> <span class="o">=</span> <span class="n">ConfigReader</span><span class="p">(</span><span class="n">config_file_dir</span><span class="o">=</span> <span class="s1">&#39;.</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">config_list</span><span class="o">=</span><span class="n">config_list</span><span class="p">,</span><span class="n">config_table_name</span><span class="o">=</span> <span class="s1">&#39;config&#39;</span><span class="p">,)</span>
+
+	<span class="n">table_dict</span> <span class="o">=</span> <span class="n">table_reader</span><span class="o">.</span><span class="n">get_config_tables</span><span class="p">(</span><span class="n">if_walk_path</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+	<span class="n">df</span> <span class="o">=</span> <span class="n">table_dict</span><span class="p">[</span><span class="s1">&#39;time process&#39;</span><span class="p">]</span>
+
+	<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

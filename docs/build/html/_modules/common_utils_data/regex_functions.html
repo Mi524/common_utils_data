@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.regex_functions &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.regex_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.regex_functions 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span> 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span> 
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">punctuation</span>
+<span class="kn">import</span> <span class="nn">string</span> 
+
+<span class="kn">from</span> <span class="nn">flashtext</span> <span class="kn">import</span> <span class="n">KeywordProcessor</span>
+
+<span class="c1"># keyword_processor = KeywordProcessor()</span>
+<span class="c1"># for i in [&#39;tests&#39;,&#39;testss&#39;,&#39;test&#39;,&#39;5G is(not&#39;,&#39;ok&#39;,&#39;100%&#39;,&#39;不可能吧&#39;,&#39;优势&#39;,&#39;在哪里&#39;,&#39;哪里&#39;]:</span>
+<span class="c1">#     keyword_processor.add_keyword(i)</span>
+
+<span class="c1"># print(keyword_processor.get_all_keywords())</span>
+
+<span class="c1"># text = &#39;tests  100% are  do.ne testss/5G is(not ok&#39;</span>
+<span class="c1"># # text = &#39;你觉得5G或者优势在哪里&#39;</span>
+<span class="c1"># kw_found = keyword_processor.extract_keywords(text)</span>
+
+<span class="c1"># print(kw_found)</span>
+
+<span class="c1"># exit()</span>
+
+<div class="viewcode-block" id="get_keyword_pat"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.get_keyword_pat">[文档]</a><span class="k">def</span> <span class="nf">get_keyword_pat</span><span class="p">(</span><span class="n">keyword_list</span><span class="p">):</span>
+    <span class="n">keyword_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">keyword_list</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">keyword_pat</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;(&#39;</span><span class="o">+</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keyword_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> 
+
+    <span class="k">return</span> <span class="n">keyword_pat</span></div>
+
+<span class="c1">#数字模糊匹配函数,数字连着命中才算符合条件，即128对应的必须是128才算命中一个，命中12不算</span>
+<div class="viewcode-block" id="number_similarity"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.number_similarity">[文档]</a><span class="k">def</span> <span class="nf">number_similarity</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">common_pattern</span><span class="p">):</span>
+    <span class="c1">#该函数需要传入两者同时共存的内存模式,如果不填就简单地判断两个列表存在相同的匹配到的数字即可(y3 16G+128)可能会匹配到(3+16G)</span>
+    <span class="k">if</span> <span class="n">common_pattern</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">a_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">common_pattern</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a_match</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">b_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">common_pattern</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+            <span class="c1">#b是标准结果</span>
+            <span class="n">number_list_a</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span><span class="n">a_match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+            <span class="n">number_list_b</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span><span class="n">b_match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">number_list_a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="p">:</span>
+                <span class="n">intersection</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">number_list_a</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">number_list_b</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">intersection</span> <span class="ow">and</span>  <span class="nb">set</span><span class="p">(</span><span class="n">number_list_b</span><span class="p">)</span> <span class="o">==</span> <span class="n">intersection</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">number_list_b</span>
+
+    <span class="k">return</span> <span class="p">[</span> <span class="p">]</span> </div>
+    
+<div class="viewcode-block" id="check_syn_str_regex"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.check_syn_str_regex">[文档]</a><span class="k">def</span> <span class="nf">check_syn_str_regex</span><span class="p">(</span><span class="n">string_a</span><span class="p">,</span> <span class="n">string_b</span><span class="p">,</span><span class="n">special_syn_list</span><span class="p">):</span>
+    <span class="n">string_a</span> <span class="o">=</span> <span class="n">string_a</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">string_b</span> <span class="o">=</span> <span class="n">string_b</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="n">match_result_a</span> <span class="o">=</span> <span class="p">[</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">string_a</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">special_syn_list</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">string_a</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span> <span class="p">]</span>  
+    <span class="n">match_result_b</span> <span class="o">=</span> <span class="p">[</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">string_b</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">special_syn_list</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">string_b</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span> <span class="p">]</span>
+
+    <span class="n">intersection</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">match_result_a</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">match_result_b</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">match_result_a</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_syn_str_regex_number"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.check_syn_str_regex_number">[文档]</a><span class="k">def</span> <span class="nf">check_syn_str_regex_number</span><span class="p">(</span><span class="n">string_a</span><span class="p">,</span> <span class="n">string_b</span><span class="p">,</span> <span class="n">special_syn_list</span><span class="p">):</span>
+    <span class="c1">#数字的不需要判断intersection,确认两者同时存在即可,即两者都存在 </span>
+    <span class="c1">#x = check_syn_str_regex_number(&#39;(128G+8G)&#39;,&#39;8+28G&#39;,[&#39;(\d{1,4}[GB]?\+\d{1,4}[GB]?)|(\d{1,4}G{1}B?)&#39;]) --&gt;True因为都符合</span>
+    <span class="n">string_a</span> <span class="o">=</span> <span class="n">string_a</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">string_b</span> <span class="o">=</span> <span class="n">string_b</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="n">match_result_a</span> <span class="o">=</span> <span class="p">[</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">string_a</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">special_syn_list</span> <span class="p">]</span>  
+    <span class="n">match_result_b</span> <span class="o">=</span> <span class="p">[</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">string_b</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">special_syn_list</span> <span class="p">]</span>  
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">match_result_a</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">match_result_b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span> 
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">match_result_a</span><span class="p">,</span><span class="n">match_result_b</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">b</span> <span class="o">==</span> <span class="kc">True</span> <span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="strB2Q"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.strB2Q">[文档]</a><span class="k">def</span> <span class="nf">strB2Q</span><span class="p">(</span><span class="n">ustring</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;把字符串半角转全角&quot;&quot;&quot;</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ustring</span><span class="p">:</span>
+        <span class="n">rstring</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">uchar</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">inside_code</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">uchar</span><span class="p">)</span>
+            <span class="c1"># 全角空格直接转换</span>
+            <span class="k">if</span> <span class="n">inside_code</span> <span class="o">==</span> <span class="mi">32</span><span class="p">:</span>  
+                <span class="n">inside_code</span> <span class="o">=</span> <span class="mi">12288</span>
+            <span class="c1"># 全角字符（除空格）根据关系转化</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">inside_code</span> <span class="o">&gt;=</span> <span class="mi">33</span> <span class="ow">and</span> <span class="n">inside_code</span> <span class="o">&lt;=</span> <span class="mi">126</span><span class="p">):</span>  
+                <span class="n">inside_code</span> <span class="o">+=</span> <span class="mi">65248</span>
+            <span class="n">rstring</span> <span class="o">+=</span> <span class="nb">chr</span><span class="p">(</span><span class="n">inside_code</span><span class="p">)</span>
+        <span class="n">ss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rstring</span><span class="p">)</span>
+    <span class="c1">#顿号要转成逗号</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">strQ2B</span><span class="p">(</span><span class="n">ustring</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;把字符串全角转半角&quot;&quot;&quot;</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ustring</span><span class="p">:</span>
+        <span class="n">rstring</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">uchar</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">inside_code</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">uchar</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inside_code</span> <span class="o">==</span> <span class="mi">12288</span><span class="p">:</span>  <span class="c1"># 全角空格直接转换</span>
+                <span class="n">inside_code</span> <span class="o">=</span> <span class="mi">32</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">inside_code</span> <span class="o">&gt;=</span> <span class="mi">65281</span> <span class="ow">and</span> <span class="n">inside_code</span> <span class="o">&lt;=</span> <span class="mi">65374</span><span class="p">):</span>  <span class="c1"># 全角字符（除空格）根据关系转化</span>
+                <span class="n">inside_code</span> <span class="o">-=</span> <span class="mi">65248</span>
+            <span class="n">rstring</span> <span class="o">+=</span> <span class="nb">chr</span><span class="p">(</span><span class="n">inside_code</span><span class="p">)</span>
+        <span class="n">ss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rstring</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+
+<div class="viewcode-block" id="strQ2B"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.strQ2B">[文档]</a><span class="k">def</span> <span class="nf">strQ2B</span><span class="p">(</span><span class="n">ustring</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;把字符串全角转半角&quot;&quot;&quot;</span>
+    <span class="n">halfwidth_symbol</span> <span class="o">=</span> <span class="s1">&#39;!</span><span class="se">\&quot;\&quot;</span><span class="s1">#$%&amp;</span><span class="se">\&#39;\&#39;</span><span class="s1">()*+,-./:;&lt;=&gt;?@[]_{|}~ &#39;</span>
+    <span class="n">fullwidth_symbol</span> <span class="o">=</span> <span class="s1">&#39;！“”#$%&amp;‘’（）*+，-。/：；《=》？@【】_{|}~ &#39;</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">fullwidth_symbol</span><span class="p">,</span> <span class="n">halfwidth_symbol</span><span class="p">)</span>
+
+    <span class="n">ustring</span> <span class="o">=</span> <span class="n">ustring</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">translator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ustring</span></div>
+
+
+<div class="viewcode-block" id="strip_puntuations"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.strip_puntuations">[文档]</a><span class="k">def</span> <span class="nf">strip_puntuations</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+    <span class="c1">#清空字符串两边的所有符号</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">punctuation</span><span class="p">:</span>
+        <span class="n">input_string</span> <span class="o">=</span> <span class="n">input_string</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_string</span></div>
+
+<div class="viewcode-block" id="replace_punctuations"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.replace_punctuations">[文档]</a><span class="k">def</span> <span class="nf">replace_punctuations</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="n">replace_to_symbol</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">exclude</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span> <span class="p">):</span>
+    <span class="c1">#将字符串中的所有符号统一替换成空格</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="p">[</span> <span class="n">exclude</span> <span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">input_string</span>
+
+    <span class="n">mapping_result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">replace_to_symbol</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span> <span class="k">else</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">])</span>
+
+    <span class="n">translator</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">,</span> <span class="n">mapping_result</span><span class="p">)</span>
+    <span class="n">input_string</span> <span class="o">=</span> <span class="n">input_string</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">translator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_string</span> </div>
+
+<div class="viewcode-block" id="replace_multi_symbol"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.replace_multi_symbol">[文档]</a><span class="k">def</span> <span class="nf">replace_multi_symbol</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;把多个符号替换成单个，比如多个换行符 替换成 一个换行符,replace(&#39;\n\n&#39;,&#39;\n&#39;)并不能解决问题&quot;&quot;&quot;</span>
+    <span class="n">symbol_double</span> <span class="o">=</span> <span class="n">symbol</span> <span class="o">+</span> <span class="n">symbol</span>
+    <span class="k">while</span> <span class="n">symbol_double</span> <span class="ow">in</span> <span class="n">string</span><span class="p">:</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">symbol_double</span><span class="p">,</span><span class="n">symbol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">string</span></div>
+
+<div class="viewcode-block" id="symbol_to_spaces"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.symbol_to_spaces">[文档]</a><span class="k">def</span> <span class="nf">symbol_to_spaces</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">replace_multi_symbol</span><span class="p">(</span><span class="n">replace_punctuations</span><span class="p">(</span><span class="n">strQ2B</span><span class="p">(</span><span class="n">string</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">string</span></div>
+
+<div class="viewcode-block" id="normalize_punctuations"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.normalize_punctuations">[文档]</a><span class="k">def</span> <span class="nf">normalize_punctuations</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="c1">#用来做拆分（匹配是需要把符号全变成空格，拆分不能改变结果符号）</span>
+    <span class="c1">#把string的所有符号标准化（全角全部统一转成半角，连续重复的符号变成单个,两边都不留空格或者换行符）</span>
+    <span class="c1">#转成半角</span>
+    <span class="c1"># string = strQ2B(string)</span>
+    <span class="c1"># for s in punctuation:</span>
+    <span class="c1">#     string = replace_multi_symbol(string, s)</span>
+    <span class="c1">#     #确保两边没有特殊符号</span>
+    <span class="c1"># string = string.strip()</span>
+    <span class="k">return</span> <span class="n">string</span>   </div>
+
+<div class="viewcode-block" id="replace_re_special"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.replace_re_special">[文档]</a><span class="k">def</span> <span class="nf">replace_re_special</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+    <span class="c1">#注意\要写在前面，因为后面循环替换了\\进去</span>
+    <span class="k">for</span> <span class="n">special_symbol</span> <span class="ow">in</span> <span class="sa">r</span><span class="s1">&#39;\-+()[]</span><span class="si">{}</span><span class="s1">.*^$~|?^,&#39;</span><span class="p">:</span>
+        <span class="n">new_special_symbol</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">special_symbol</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">special_symbol</span><span class="p">,</span> <span class="n">new_special_symbol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">word</span></div>
+
+
+<div class="viewcode-block" id="search_en"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.search_en">[文档]</a><span class="k">def</span> <span class="nf">search_en</span><span class="p">(</span><span class="n">combine_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;提取出中英文混合字符串中的英文部分&quot;&quot;&quot;</span>
+    <span class="n">non_cn_pat</span> <span class="o">=</span> <span class="s2">&quot;[^</span><span class="se">\u4e00</span><span class="s2">-</span><span class="se">\u9fa5</span><span class="s2">]+&quot;</span>
+    <span class="n">en_pat</span> <span class="o">=</span> <span class="s2">&quot;.*(\w)+.*&quot;</span>
+    <span class="n">found_all</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">non_cn_pat</span><span class="p">,</span><span class="n">combine_string</span><span class="p">)</span>
+    <span class="n">en_found_all</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">found_all</span> <span class="p">:</span>   <span class="c1">#定位有英文的部分</span>
+        <span class="n">en_found_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">en_pat</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">found_all</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">en_pat</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">en_found_all</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">en_found_all</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="partial_match_pct"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.partial_match_pct">[文档]</a><span class="k">def</span> <span class="nf">partial_match_pct</span><span class="p">(</span><span class="n">short_str</span><span class="p">,</span><span class="n">long_str</span><span class="p">,</span><span class="n">special_syn</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pro&#39;</span><span class="p">,</span><span class="s1">&#39;plus&#39;</span><span class="p">,</span><span class="s1">&#39;max&#39;</span><span class="p">,</span><span class="s1">&#39;youth&#39;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    short_str : original string</span>
+<span class="sd">    long_str : standard target string </span>
+<span class="sd">    匹配机型，不要放入两个一样的字符串，获取短字符串在长字符串中是否存在，并且占了多少个字符,</span>
+<span class="sd">    从开头开始匹配,不替换空格不用in的方式查找，带有括号的机型匹配优先级最高，</span>
+<span class="sd">    通常Y15S和Y15(4+64G)后者更容易被缩写成Y15&quot;&quot;&quot;</span>
+    <span class="c1">#20200107 :检查长字符串是否包含有特殊字符</span>
+    <span class="k">def</span> <span class="nf">check_syn_str</span><span class="p">(</span><span class="n">new_str</span><span class="p">,</span><span class="n">special_syn</span><span class="p">):</span>
+        <span class="n">new_str</span> <span class="o">=</span> <span class="n">new_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">match_syn_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">special_syn</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_str</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">match_syn_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">match_syn_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;NA&#39;</span>
+
+    <span class="c1">#暂时不懂怎么把IQOO 3 4G 优先匹配到 IQOO 3</span>
+    <span class="k">def</span> <span class="nf">match_sequence_str</span><span class="p">(</span><span class="n">short_string</span><span class="p">,</span><span class="n">long_string</span><span class="p">):</span>
+        <span class="c1">#获取一个字符串对应另一个字符串匹配的字母</span>
+        <span class="c1"># input &#39;iQOO 3 4G&#39;, IQOO 3 (5G)  --&gt; IQOO 3</span>
+        <span class="c1"># input &#39;iQOO 3 4G&#39;, IQOO 3 (4G)  --&gt; IQOO 3 4</span>
+        <span class="c1">#复制相同的一个</span>
+        <span class="n">long_counter</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="n">temp_record</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">s1</span> <span class="ow">in</span> <span class="n">short_string</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">s2</span> <span class="ow">in</span> <span class="n">long_string</span><span class="p">[</span><span class="n">long_counter</span><span class="p">:]</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="n">s1</span> <span class="o">==</span> <span class="n">s2</span><span class="p">:</span>
+                    <span class="n">long_counter</span> <span class="o">+=</span> <span class="mi">1</span> 
+                    <span class="n">temp_record</span> <span class="o">+=</span> <span class="n">s2</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">temp_record</span> 
+
+
+    <span class="n">default_result</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">long_str</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">short_str</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default_result</span>
+
+    <span class="n">short_str</span> <span class="o">=</span> <span class="n">short_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">new_long_str</span> <span class="o">=</span> <span class="n">long_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+    <span class="c1">#去掉换行符和多空格之后相等的话 直接返回长字符串</span>
+    <span class="k">if</span> <span class="n">short_str</span> <span class="o">==</span> <span class="n">new_long_str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">99</span><span class="p">,</span><span class="n">long_str</span><span class="p">)</span>
+    <span class="c1"># #防止放入同一字符串</span>
+    <span class="c1"># if short_str == new_long_str: </span>
+    <span class="c1">#   return default_result</span>
+    <span class="c1">#括号和空格都要分割处理</span>
+    <span class="k">if</span> <span class="s1">&#39;(&#39;</span> <span class="ow">in</span> <span class="n">new_long_str</span> <span class="ow">or</span> <span class="s1">&#39;（&#39;</span> <span class="ow">in</span> <span class="n">new_long_str</span> <span class="p">:</span>
+        <span class="n">new_long_str</span> <span class="o">=</span> <span class="n">new_long_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;（&#39;</span><span class="p">,</span><span class="s1">&#39;(&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># elif &#39; &#39; in new_long_str :</span>
+    <span class="c1">#   new_long_str = new_long_str.split()[0]</span>
+    <span class="sd">&quot;&quot;&quot; 匹配可能包含错误拼写，包括漏写，多写，错写的机型名, 机型名一般有NEX, S1， X3S, V1Max, V15Pro,</span>
+<span class="sd">    允许的错别字条件是：不允许数字写错，不允许前面的字母写错，当字母大于等于3个时，允许漏写或者错写，多写2个字母,</span>
+<span class="sd">    比如pro写成pr ,prou, max写成ma, V15Pro 写成 V15P（如果有V15P应该在之前就可以关联上，所以排除他是V15P的可能，</span>
+<span class="sd">    更大可能是想写V15Pro）&quot;&quot;&quot;</span>
+    <span class="c1">#从头开始匹配的时候，如果完整的short_str是准确拼写的，正常返回，如果有错别字，采用else以下的匹配方式</span>
+    <span class="n">match_short_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="c1">#前两/三位字母相同,方便后面elif写条件</span>
+    <span class="n">first2_letter_equal</span> <span class="o">=</span> <span class="n">short_str</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">new_long_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">first3_letter_equal</span> <span class="o">=</span> <span class="n">short_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="n">new_long_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="c1">#前3位字符串包含2个数字的情况 必须满足前3个字母相同,</span>
+    <span class="n">first3_letter_2num_short</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;[0-9]{2,}&#39;</span><span class="p">,</span><span class="n">short_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span> <span class="o">!=</span> <span class="kc">None</span>
+    <span class="n">first3_letter_2num_long</span> <span class="o">=</span>  <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;[0-9]{2,}&#39;</span><span class="p">,</span><span class="n">new_long_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span> <span class="o">!=</span> <span class="kc">None</span>
+
+    <span class="n">first3_letter_less2num_short</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">first3_letter_2num_short</span>
+    <span class="n">first3_letter_less2num_long</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">first3_letter_2num_long</span>
+
+    <span class="c1">#一个字符直接返回0,两个字符，去掉空格之后的前两个字符要完全相等,并且要确保长字符串里没有special_syn的字符</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">short_str</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">:</span>  
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">check_syn_str</span><span class="p">(</span><span class="n">new_long_str</span><span class="p">,</span><span class="n">special_syn</span><span class="p">):</span>
+            <span class="n">new_long_str</span> <span class="o">=</span> <span class="n">new_long_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">short_str</span> <span class="o">==</span> <span class="n">new_long_str</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">long_str</span><span class="p">),</span><span class="n">long_str</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default_result</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1">#如果长字符串含有pro等字符 直接判断不匹配</span>
+            <span class="k">return</span> <span class="n">default_result</span>
+    <span class="c1">#至少出现3个字符,并且前两个字母(如果前两位是字母+数字，后面不再有数字),如果前3位包含2个数字,前3个字符要相同,规避掉V 15这种空格的情况 </span>
+    <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">short_str</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">first2_letter_equal</span><span class="p">)</span> <span class="ow">and</span> \
+         <span class="p">(</span>
+               <span class="p">(</span><span class="n">first3_letter_2num_short</span> <span class="ow">and</span> <span class="n">first3_letter_2num_long</span> <span class="ow">and</span> <span class="n">first3_letter_equal</span><span class="p">)</span> \
+            <span class="ow">or</span> <span class="p">(</span><span class="n">first3_letter_less2num_short</span> <span class="ow">and</span> <span class="n">first3_letter_less2num_long</span> <span class="ow">and</span> <span class="n">first2_letter_equal</span><span class="p">)</span>
+         <span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">short_str</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">short_str</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_long_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+                <span class="n">match_short_str</span> <span class="o">=</span> <span class="n">short_str</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">continue</span>        
+        <span class="c1">#优先计算匹配率大的字符串,并且为了实现区分V11i 优先匹配到V11而不是V11Pro的情况，而外加一个长字符串的比率</span>
+        <span class="c1">#--计算结果相同(0.75, &#39;V11Pro&#39;)  (0.75, &#39;V11&#39;),后面的sort比较难实现long_str的顺序排列</span>
+        <span class="k">if</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">long_str</span> <span class="ow">or</span> <span class="s1">&#39;(&#39;</span> <span class="ow">in</span> <span class="n">long_str</span><span class="p">:</span>
+            <span class="n">long_str_bias</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">match_short_str</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">long_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">100</span>  <span class="c1">#比例需要调小</span>
+            <span class="c1">#如果去掉空格和( 符号之后的long_str_bias仍然相等，就将原来的标准机型全部去掉这些字符，对比整体全部的匹配度，做一个bias</span>
+            <span class="c1"># long_str_bias += len(match_sequence_str(short_str,long_string)) / (len(short_str) + len(long_string)) / 1000  #比例更小</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1">#没有出现空格和（ 的 不带pro的应该优先</span>
+            <span class="n">long_str_bias</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">match_short_str</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">long_str</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span> <span class="o">+</span> <span class="mf">0.00001</span> 
+
+        <span class="c1">#确保短字符和长字符同时有或者同时没有special_syn_str </span>
+        <span class="k">if</span> <span class="n">check_syn_str</span><span class="p">(</span><span class="n">short_str</span><span class="p">,</span><span class="n">special_syn</span><span class="p">)</span> <span class="o">==</span> <span class="n">check_syn_str</span><span class="p">(</span><span class="n">new_long_str</span><span class="p">,</span><span class="n">special_syn</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">match_short_str</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">short_str</span><span class="p">)</span> <span class="o">+</span> <span class="n">long_str_bias</span> <span class="p">,</span><span class="n">long_str</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">default_result</span></div>
+
+
+<div class="viewcode-block" id="re_sub_replace"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.re_sub_replace">[文档]</a><span class="k">def</span> <span class="nf">re_sub_replace</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">string</span><span class="p">,</span><span class="n">repace_symbols</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">),</span><span class="n">group_name</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    当re.sub(pattern,repl,string)内置的repl = &quot;g&lt;1&gt;&quot; 不能满足替换需求的时候,</span>
+<span class="sd">    比如需要将group目标内的文字中的某个符号替换掉, 使用的时候要注意替换代码内的sub replace符号</span>
+<span class="sd">    :param pattern : re pattern </span>
+<span class="sd">    :param string : original string </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">replace_match</span><span class="p">(</span><span class="n">matched</span><span class="p">):</span>
+        <span class="c1">#re.sub会自动传入matched结果</span>
+        <span class="n">original_string</span> <span class="o">=</span> <span class="n">matched</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="c1">#pattern支持填入group_name</span>
+        <span class="n">matched_string</span> <span class="o">=</span> <span class="n">matched</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+        <span class="n">replace_string</span> <span class="o">=</span> <span class="n">original_string</span>\
+        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">matched_string</span><span class="p">,</span><span class="n">matched_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">replace_symbols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">replace_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">replace_string</span>
+    
+    <span class="n">new_string</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">replace_match</span><span class="p">,</span><span class="n">string</span><span class="p">,</span><span class="n">repace_symbols</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">new_string</span></div>
+
+
+<div class="viewcode-block" id="re_findall_replace"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.re_findall_replace">[文档]</a><span class="k">def</span> <span class="nf">re_findall_replace</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">string</span><span class="p">,</span><span class="n">replace_symbols</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    当re.sub(pattern,repl,string)内置的repl = &quot;g&lt;1&gt;&quot; 不能满足替换需求的时候,</span>
+<span class="sd">    比如需要将group目标内的文字中的某个符号替换掉,并且需要match多个group目标</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matched_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">new_string</span> <span class="o">=</span> <span class="n">string</span>
+    <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">matched_list</span><span class="p">:</span>
+        <span class="n">new_string</span> <span class="o">=</span> <span class="n">new_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span><span class="n">mat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">replace_symbols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">replace_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">new_string</span></div>
+
+
+<div class="viewcode-block" id="re_findall_sub"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.re_findall_sub">[文档]</a><span class="k">def</span> <span class="nf">re_findall_sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">string</span><span class="p">,</span><span class="n">replace_symbols</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    当re.sub(pattern,repl,string)内置的repl = &quot;g&lt;1&gt;&quot; 不能满足替换需求的时候,</span>
+<span class="sd">    比如</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matched_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">new_string</span> <span class="o">=</span> <span class="n">string</span>
+    <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">matched_list</span><span class="p">:</span>
+        <span class="n">new_string</span> <span class="o">=</span> <span class="n">new_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span><span class="n">mat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">replace_symbols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">replace_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">new_string</span></div>
+
+
+<div class="viewcode-block" id="split_wrong_combine"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.regex_functions.split_wrong_combine">[文档]</a><span class="k">def</span> <span class="nf">split_wrong_combine</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">sub_pattern</span><span class="p">,</span><span class="n">string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    需要处理爬虫换行符的问题, 抓取的时候把换行符去掉了，导致单词连接成错误的形式</span>
+<span class="sd">    比如 axxBx, AxxxCONs, usagePROgreat, slow3.Great sunglass</span>
+<span class="sd">     (注意 3app , 3PlayStore只能算是拼写错误，不需要拆分, LED3 拆不了，陷入无限循环)</span>
+<span class="sd">    需要将两个错误合并的单词用换行符替换拆分,</span>
+<span class="sd">    :param pattern : the original pattern that we want to find out</span>
+<span class="sd">    :param sub_pattern : sub pattern to extract from pattern, </span>
+<span class="sd">    will be replaced with original + &#39;\n&#39; or &#39;\n&#39; + original  </span>
+<span class="sd">    :param string : target string</span>
+<span class="sd">    e.g</span>
+<span class="sd">    pattern = &#39;[A-Z]?[a-z]+[A-Z0-9]+[a-zA-Z]*&#39; </span>
+<span class="sd">    sub_pattern = &#39;[A-Z0-9]+[a-z]*&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#记录需要修改的部分</span>
+    <span class="n">new_string</span> <span class="o">=</span> <span class="n">string</span>
+    <span class="n">new_string_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">matched_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">new_string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">matched_list</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">matched_list</span><span class="p">:</span>
+            <span class="n">match_sub</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">sub_pattern</span><span class="p">,</span><span class="n">mat</span><span class="p">)</span>
+            <span class="c1">#需要确保sub_pattern 能匹配出 pattern 匹配到的内容的部分目标</span>
+            <span class="k">if</span> <span class="n">match_sub</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">match_sub</span> <span class="o">=</span> <span class="n">match_sub</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+                <span class="n">replace_match</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">match_sub</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">match_sub</span><span class="p">)</span>
+                <span class="c1">#如果替换的是第一个单词，需要特殊处理。不要替换前面的符号为换行符，而是需要保持原来单词自带的 “空”</span>
+                <span class="c1">#并且换行符 应该是加在第一个单词后面</span>
+                <span class="k">if</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">replace_match</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">replace_match</span> <span class="o">=</span> <span class="n">replace_match</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">replace_match</span>  <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">match_sub</span><span class="p">,</span> <span class="n">match_sub</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="n">replace_matched</span> <span class="o">=</span> <span class="n">split_wrong_combine</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span><span class="n">sub_pattern</span><span class="p">,</span><span class="n">replace_match</span><span class="p">)</span>
+                <span class="n">new_string_dict</span><span class="p">[</span><span class="n">mat</span><span class="p">]</span> <span class="o">=</span> <span class="n">replace_matched</span> 
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">new_string</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">new_string_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">new_string</span> <span class="o">=</span> <span class="n">new_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">new_string</span></div>
+
+
+
+<span class="c1">#++++++++++++++++++以下废弃函数++++++++++++++++++++++++</span>
+
+<span class="c1"># def standardize_country_by_cn_similarty(short_str, standard_str_list):</span>
+<span class="c1">#     #处理中文国家缩写和完整国家名称无法匹配到的情况</span>
+<span class="c1">#     standard_str_list = list(set([str(x).strip() for x in standard_str_list]))</span>
+
+<span class="c1">#     standard_str_list = sorted(standard_str_list, key=len, reverse= False)</span>
+<span class="c1">#     #通过前面字符串匹配 马来 -- &gt; 马来西亚</span>
+<span class="c1">#     standard_similarity_list = [ (s,1) if short_str in s else (s,0) for s in standard_str_list ]</span>
+<span class="c1">#     if standard_similarity_list[0][1] &gt; 0 :</span>
+<span class="c1">#         return standard_similarity_list</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         standard_similarity_list = [ ]</span>
+<span class="c1">#         for ss in standard_str_list:</span>
+<span class="c1">#             short_match_counter = 0</span>
+<span class="c1">#             for ss_each_letter in ss:</span>
+<span class="c1">#                 for s in short_str:</span>
+<span class="c1">#                     if s == ss_each_letter:</span>
+<span class="c1">#                         short_match_counter += 1</span>
+
+<span class="c1">#             #至少能匹配上两个字</span>
+<span class="c1">#             str_similarity =  short_match_counter / len(short_str) + short_match_counter / min([len(short_str),len(ss)])</span>
+<span class="c1">#             if short_match_counter &gt;= 2 :</span>
+<span class="c1">#                 standard_similarity_list.append([ss,str_similarity])</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 standard_similarity_list.append([ss, 0 ])</span>
+
+<span class="c1">#         standard_similarity_list = sorted(standard_similarity_list, key=lambda x:x[1],reverse=True)</span>
+
+<span class="c1">#     return standard_similarity_list</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

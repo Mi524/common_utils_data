@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.sequence_functions &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.sequence_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.sequence_functions 源代码</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">list , dict , itertools, Counter functions  </span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>  
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span> 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+
+<span class="c1">#检查sheet_name，如果出现重复会无法写入，后面加入不同的数字</span>
+<div class="viewcode-block" id="duplicate_elem_add_seq"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.duplicate_elem_add_seq">[文档]</a><span class="k">def</span> <span class="nf">duplicate_elem_add_seq</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
+	<span class="c1">#给列表出现重复的字符串末尾加上序号</span>
+	<span class="n">temp_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+	<span class="n">result_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">temp_dict</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_dict</span><span class="p">[</span><span class="n">s</span><span class="p">]))</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+		<span class="n">temp_dict</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> 
+		
+	<span class="k">return</span> <span class="n">result_list</span></div>
+
+
+<span class="c1">#模糊匹配的函数</span>
+<div class="viewcode-block" id="lcs"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.lcs">[文档]</a><span class="k">def</span> <span class="nf">lcs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+	<span class="c1"># longest common subsequence</span>
+    <span class="n">tbl</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+            <span class="n">tbl</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tbl</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">tbl</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">tbl</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">j</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tbl</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">tbl</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]:</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">tbl</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">tbl</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<span class="c1">#严格模糊匹配函数</span>
+<div class="viewcode-block" id="filter_lcs"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.filter_lcs">[文档]</a><span class="k">def</span> <span class="nf">filter_lcs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="c1">#过滤掉 断层的命中字符串</span>
+    <span class="n">match_list</span> <span class="o">=</span> <span class="n">lcs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">match_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">match_list</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39; &#39;</span><span class="p">]</span>
+    <span class="n">new_match_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">match_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">match_list</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">match_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">break</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_match_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">new_match_list</span>
+
+    <span class="k">return</span> <span class="n">new_match_list</span></div>
+
+
+
+<div class="viewcode-block" id="list_diff_outer_join"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.list_diff_outer_join">[文档]</a><span class="k">def</span> <span class="nf">list_diff_outer_join</span><span class="p">(</span><span class="n">split_result</span><span class="p">,</span> <span class="n">findall_result</span><span class="p">):</span>
+	<span class="c1">#寻找没有匹配上的集合，求两个列表的outer join差集</span>
+	<span class="n">not_match_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="k">for</span> <span class="n">elem_f</span> <span class="ow">in</span> <span class="n">findall_result</span><span class="p">:</span>
+		<span class="k">while</span> <span class="n">split_result</span> <span class="p">:</span>
+			<span class="n">elem_s</span> <span class="o">=</span> <span class="n">split_result</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">elem_s</span> <span class="o">!=</span> <span class="n">elem_f</span> <span class="p">:</span>
+				<span class="n">not_match_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elem_s</span><span class="p">)</span>
+			<span class="k">else</span> <span class="p">:</span>
+				<span class="k">break</span>
+				
+	<span class="k">return</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">not_match_list</span> <span class="o">+</span> <span class="n">split_result</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span> </div>
+
+<div class="viewcode-block" id="sublist_combinations_all"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.sublist_combinations_all">[文档]</a><span class="k">def</span> <span class="nf">sublist_combinations_all</span><span class="p">(</span><span class="n">value_list</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;获取一个完整列表的所有有序子列表的组成可能&quot;&quot;&quot;</span>
+	<span class="n">value_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_list</span><span class="p">)</span>
+	<span class="n">value_combination_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">value_len</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span> 
+		<span class="n">value_combination</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">(</span><span class="n">value_list</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">value_combination</span><span class="p">:</span>
+			<span class="n">value_combination_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+
+	<span class="k">return</span> <span class="n">value_combination_list</span></div>
+
+<div class="viewcode-block" id="find_sublists_seq"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.find_sublists_seq">[文档]</a><span class="k">def</span> <span class="nf">find_sublists_seq</span><span class="p">(</span><span class="n">value_list</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;获取一个完整列表的所有有序子列表的组成可能,</span>
+<span class="sd">	[3, 4, 3, 5, 6] --&gt;</span>
+<span class="sd">	[[3, 4], 3, 5, 6]</span>
+<span class="sd">	[3, [4, 3], 5, 6]</span>
+<span class="sd">	[3, 4, [3, 5], 6]</span>
+<span class="sd">	[3, 4, 3, [5, 6]]</span>
+<span class="sd">	例如：not up to mark  notuptomark，not good --&gt; notgood  &quot;&quot;&quot;</span>
+	<span class="n">list_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_list</span><span class="p">)</span>
+	<span class="n">record_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="k">for</span> <span class="n">word_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">list_len</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>  
+		<span class="k">for</span> <span class="n">start_pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">list_len</span> <span class="o">-</span> <span class="n">word_num</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">):</span>
+			<span class="n">temp_list</span> <span class="o">=</span>  <span class="n">value_list</span><span class="p">[:</span><span class="n">start_pos</span><span class="p">]</span> \
+					  <span class="o">+</span> <span class="p">[</span><span class="n">value_list</span><span class="p">[</span><span class="n">start_pos</span><span class="p">:</span><span class="n">start_pos</span><span class="o">+</span><span class="n">word_num</span><span class="p">]]</span> \
+					  <span class="o">+</span>  <span class="n">value_list</span><span class="p">[</span><span class="n">start_pos</span><span class="o">+</span><span class="n">word_num</span><span class="p">:]</span>
+
+			<span class="n">record_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_list</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">record_list</span></div>
+
+<div class="viewcode-block" id="find_sublist_indexes"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.find_sublist_indexes">[文档]</a><span class="k">def</span> <span class="nf">find_sublist_indexes</span><span class="p">(</span><span class="n">complete_list</span><span class="p">,</span><span class="n">sub_list</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;从完整大列表中搜索出小的子列表 从头到尾 在大列表中对应的索引（优先第一个元素,可以求出前中后的所有索引位置</span>
+<span class="sd">	[a,b,c,d,e] --&gt; [b,d,e]  --&gt;  [1,3,4]  --&gt; result range_index_dict</span>
+<span class="sd">	:param complete_list:</span>
+<span class="sd">	:param sub_list</span>
+<span class="sd">	:return : 	</span>
+<span class="sd">	 range_index_dict = {</span>
+<span class="sd">	&#39;sub_list_index&#39;:record_index_list,  </span>
+<span class="sd">	&#39;pre_range_index&#39;:pre_range_index_list,</span>
+<span class="sd">	&#39;mid_range_index&#39;:mid_range_index_list,</span>
+<span class="sd">	&#39;back_range_index&#39;:back_range_index_list</span>
+<span class="sd">	}</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="c1">#防止原始列表被修改，复制版本列表会被修改</span>
+	<span class="n">complete_list_copy</span> <span class="o">=</span> <span class="n">complete_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+	<span class="n">record_index_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="n">record_index</span> <span class="o">=</span> <span class="mi">0</span> 
+	<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sub_list</span><span class="p">:</span>
+		<span class="n">split_index</span> <span class="o">=</span> <span class="n">complete_list_copy</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+		<span class="c1">#跳过本元素取下一个开始的列表后部分</span>
+		<span class="n">complete_list_copy</span> <span class="o">=</span> <span class="n">complete_list_copy</span><span class="p">[</span><span class="n">split_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="p">]</span>
+		<span class="c1">#记录每次的索引位置,split_index是每次拆分后的单独记录</span>
+		<span class="n">record_index</span> <span class="o">+=</span> <span class="n">split_index</span> 
+		<span class="n">record_index_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record_index</span><span class="p">)</span>
+		<span class="c1">#每次带走一个元素,记录索引需要对应加上带走的元素数量(+1)</span>
+		<span class="n">record_index</span> <span class="o">+=</span> <span class="mi">1</span> 
+	<span class="c1">#重叠的元素范围 range_index_dict</span>
+
+	<span class="c1">#返回前中后三个部分的所有概念index</span>
+	<span class="n">complete_list_index</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">complete_list</span><span class="p">))]</span>
+	<span class="n">pre_range_index_list</span> <span class="o">=</span> <span class="n">complete_list_index</span><span class="p">[:</span><span class="n">record_index_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+	<span class="n">mid_range_index_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">complete_list_index</span><span class="p">[</span><span class="n">record_index_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">record_index_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> \
+						<span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">record_index_list</span> <span class="p">]</span> 
+
+	<span class="n">back_range_index_list</span> <span class="o">=</span> <span class="n">complete_list_index</span><span class="p">[</span><span class="n">record_index_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+
+	<span class="n">range_index_dict</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="s1">&#39;sub_list_index&#39;</span><span class="p">:</span><span class="n">record_index_list</span><span class="p">,</span>  
+	<span class="s1">&#39;pre_range_index&#39;</span><span class="p">:</span><span class="n">pre_range_index_list</span><span class="p">,</span>
+	<span class="s1">&#39;mid_range_index&#39;</span><span class="p">:</span><span class="n">mid_range_index_list</span><span class="p">,</span>
+	<span class="s1">&#39;back_range_index&#39;</span><span class="p">:</span><span class="n">back_range_index_list</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="n">range_index_dict</span></div>
+
+
+<span class="c1"># a = find_sublist_indexes([&#39;C_FACE&#39;, &#39;D_BE_VERB&#39;, &#39;D_BAD_1&#39;, &#39;D_AND&#39;, &#39;D_WORK&#39;, &#39;D_PREPOSITION&#39;],[&#39;C_FACE&#39;, &#39;D_BE_VERB&#39;, &#39;D_BAD_1&#39;])</span>
+
+<span class="c1"># print(a)</span>
+
+<div class="viewcode-block" id="convert_twolist2dict"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.convert_twolist2dict">[文档]</a><span class="k">def</span> <span class="nf">convert_twolist2dict</span><span class="p">(</span><span class="n">list_a</span><span class="p">,</span><span class="n">list_b</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	将两个列表转成字典形式</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">list_a</span><span class="p">,</span><span class="n">list_b</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="list_transpose"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.list_transpose">[文档]</a><span class="k">def</span> <span class="nf">list_transpose</span><span class="p">(</span><span class="n">original_list</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;列表转置&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">original_list</span><span class="p">,</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">l</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="uneven_list_dictify"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.uneven_list_dictify">[文档]</a><span class="k">def</span> <span class="nf">uneven_list_dictify</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+	<span class="c1">#为了让最后一级也全都是键值,补充进空字符串</span>
+	<span class="n">values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">+</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">values</span> <span class="p">]</span>
+	<span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+		<span class="n">here</span> <span class="o">=</span> <span class="n">d</span>
+		<span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+			<span class="k">if</span> <span class="n">elem</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">here</span><span class="p">:</span>
+				<span class="n">here</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+			<span class="n">here</span> <span class="o">=</span> <span class="n">here</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+		<span class="n">here</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="forward_fill"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.forward_fill">[文档]</a><span class="k">def</span> <span class="nf">forward_fill</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+	<span class="c1">#区别于pandas的forwordfill,不会填充后面为空的部分，只向前填充前面列空的部分</span>
+	<span class="n">complete_row</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">complete_row</span><span class="p">]</span>
+	<span class="c1">#第一行必定是有完整的前几列数据,从第二行开始读取填充</span>
+	<span class="k">for</span> <span class="n">v_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">v_index</span><span class="p">]</span> 
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+			<span class="c1">#如果发现有缺失的部分</span>
+			<span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+				<span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">complete_row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">complete_row</span> <span class="o">=</span> <span class="n">value</span>
+				<span class="k">break</span>
+		<span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="recursive_find_nodes"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.recursive_find_nodes">[文档]</a><span class="k">def</span> <span class="nf">recursive_find_nodes</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span><span class="n">parrent_node</span><span class="p">,</span><span class="n">record_list</span><span class="p">):</span>
+	<span class="c1">#记录数字的previous_num为列表形式 [ ]</span>
+	<span class="c1">#需要返回一组列表，形式为 [ current_node, parrent_node]</span>
+	<span class="c1">#例子：# recursive_find_nodes(nested_dict,parrent_node = &#39;&#39;,record_list= record_list)</span>
+	<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+			<span class="n">recursive_find_nodes</span><span class="p">(</span><span class="n">dictionary</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">k</span><span class="p">,</span><span class="n">record_list</span><span class="p">)</span>
+			<span class="n">record_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">k</span><span class="p">,</span><span class="n">parrent_node</span><span class="p">])</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">record_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">dictionary</span><span class="p">,</span><span class="n">parrent_node</span><span class="p">])</span>
+
+	<span class="k">return</span> <span class="n">record_list</span></div>
+
+<div class="viewcode-block" id="recursive_gen_nodecodes"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sequence_functions.recursive_gen_nodecodes">[文档]</a><span class="k">def</span> <span class="nf">recursive_gen_nodecodes</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span><span class="n">parrent_node</span><span class="p">,</span><span class="n">record_list</span><span class="p">,</span><span class="n">level</span><span class="p">,</span><span class="n">pre_counter</span><span class="p">):</span>
+	<span class="c1">#同recursive_gen_nodecodes, 添加了</span>
+	<span class="c1">#不生成编码的函数</span>
+	<span class="c1">#例子：recursive_gen_nodecodes(nested_dict,parrent_node = &#39;&#39;,record_list= record_list,level=0,pre_counter=[&#39;00&#39;,&#39;00&#39;,&#39;00&#39;,&#39;00&#39;])</span>
+	<span class="n">counter_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>  
+	<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span> 
+	<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+			<span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span> 
+			<span class="n">pre_counter</span><span class="p">[</span><span class="n">level</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+			<span class="n">record_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pre_counter</span><span class="p">[:</span><span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span><span class="n">k</span><span class="p">,</span><span class="n">parrent_node</span><span class="p">])</span>
+			<span class="n">recursive_gen_nodecodes</span><span class="p">(</span><span class="n">dictionary</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">k</span> <span class="p">,</span><span class="n">record_list</span><span class="p">,</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pre_counter</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">record_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pre_counter</span><span class="p">),</span><span class="n">dictionary</span><span class="p">,</span><span class="n">parrent_node</span><span class="p">])</span>
+
+	<span class="k">return</span> <span class="n">record_list</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -561,9 +561,10 @@ def stack_list_column(df,split_column):
 
 def expand_stacked_column_to_list(df,expand_column,unique_key):
 	"""
-	#为了统计蓝色部分字段，把故障类别堆积回到列表的状态
-	:param df : 原语言拆分匹配后已经被展开的表格
-	:param expand_column : 被展开过的字段
+	为了统计蓝色部分字段，把故障类别堆积回到列表的状态
+
+	:param df: 原语言拆分匹配后已经被展开的表格
+	:param expand_column: 被展开过的字段
 	:param unique_key : 唯一编码字段
 	"""
 	original_columns = df.columns.tolist()

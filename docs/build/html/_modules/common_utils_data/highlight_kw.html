@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.highlight_kw &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.highlight_kw</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.highlight_kw 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">xlsxwriter.workbook</span> <span class="kn">import</span> <span class="n">Workbook</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter.exceptions</span> <span class="kn">import</span> <span class="n">FileCreateError</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">xlrd</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">time</span> 
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">.os_functions</span> <span class="kn">import</span> <span class="n">choose_file</span><span class="p">,</span><span class="n">choose_sheet_column</span><span class="p">,</span><span class="n">get_require_files</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span> 
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="replace_re_special"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.replace_re_special">[文档]</a><span class="k">def</span> <span class="nf">replace_re_special</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+	<span class="c1">#注意\要写在前面，因为后面循环替换了\\进去</span>
+	<span class="k">for</span> <span class="n">special_symbol</span> <span class="ow">in</span> <span class="sa">r</span><span class="s1">&#39;\-+()[]</span><span class="si">{}</span><span class="s1">.*^$~|?&#39;</span><span class="p">:</span>
+		<span class="n">new_special_symbol</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">special_symbol</span>
+		<span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">special_symbol</span><span class="p">,</span> <span class="n">new_special_symbol</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">word</span></div>
+
+<div class="viewcode-block" id="get_keyword_dict"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.get_keyword_dict">[文档]</a><span class="k">def</span> <span class="nf">get_keyword_dict</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+	<span class="n">found_tag</span> <span class="o">=</span> <span class="mi">0</span> 
+	<span class="k">while</span> <span class="n">found_tag</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">wb</span> <span class="o">=</span> <span class="n">xlrd</span><span class="o">.</span><span class="n">open_workbook</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+			<span class="n">found_tag</span> <span class="o">+=</span> <span class="mi">1</span> 
+		<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+			<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> &quot;Keywords.xlsx&quot; File Not Found in Current Folder!</span><span class="se">\n</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">Please put the Keywords.xlsx to current folder and Press Enter to continue&#39;</span><span class="p">)</span>
+			<span class="k">continue</span> 
+
+	<span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">sheet_by_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+	<span class="c1">#保存每个关键词列的文字</span>
+	<span class="n">keyword_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+
+	<span class="c1">#表头,根据表头获取应该写入红色还是蓝色，还是粗体</span>
+	<span class="n">header_list</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ws</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+			<span class="n">header</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+		<span class="k">elif</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">)</span> <span class="p">:</span>
+			<span class="n">header</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="c1">#为了防止两列中间隔一个空的表头单元格</span>
+			<span class="n">header</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="n">header_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">header_list</span><span class="p">:</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Keywords.xlsx should have table header/headers such as red,blue,bold etc.&#39;</span><span class="p">)</span>
+		<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Press Enter to exit&#39;</span><span class="p">)</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+	<span class="n">seen_keywords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">get_rows</span><span class="p">())[</span><span class="mi">1</span><span class="p">:]:</span>
+		<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">format_word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header_list</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">format_word</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+				<span class="n">keyword_value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> 
+				<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span> <span class="o">==</span> <span class="n">keyword_value</span><span class="p">:</span>
+					<span class="n">keyword</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+				<span class="k">else</span><span class="p">:</span>  <span class="c1">#必须去掉容易导致歧义的特殊符号</span>
+					<span class="n">keyword</span> <span class="o">=</span> <span class="n">replace_re_special</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">keyword_value</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+				<span class="k">if</span> <span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_keywords</span> <span class="ow">and</span> <span class="n">keyword</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="p">:</span>
+					<span class="n">keyword_dict</span><span class="p">[</span><span class="n">format_word</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+					<span class="n">seen_keywords</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+
+	<span class="n">wb</span><span class="o">.</span><span class="n">release_resources</span><span class="p">()</span>
+
+	<span class="k">return</span> <span class="n">keyword_dict</span></div>
+
+<div class="viewcode-block" id="get_rich_param_list"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.get_rich_param_list">[文档]</a><span class="k">def</span> <span class="nf">get_rich_param_list</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">,</span><span class="n">insert_dict</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	通过文本和关键词获取需要填入xlsxwriter write_rich_string的第三个内容/param的格式,忽略大小写,re.I</span>
+<span class="sd">	:param text:</span>
+<span class="sd">	:param keyword_list </span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="c1">#关键词列表为空返回原文</span>
+	<span class="n">keyword_list</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">keyword_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+		<span class="n">keyword_list</span> <span class="o">+=</span> <span class="n">x</span>
+
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">keyword_list</span><span class="p">:</span>
+		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;record_list&#39;</span><span class="p">:</span><span class="n">text</span><span class="p">}</span>
+
+	<span class="c1">#3.5 导致无法正确定位数字和文字</span>
+	<span class="n">keyword_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>  <span class="n">keyword_list</span> <span class="p">]</span>
+	<span class="n">keyword_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keyword_list</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+	<span class="n">keyword_pat</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;(&#39;</span><span class="o">+</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keyword_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+	<span class="c1">#通过关键词拆分的句子</span>
+	<span class="k">try</span><span class="p">:</span>
+		<span class="n">split_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">keyword_pat</span><span class="p">,</span><span class="n">text</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+		<span class="n">split_list</span> <span class="o">=</span>  <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split_list</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span>	
+		<span class="c1">#找到的关键词目标</span>
+		<span class="n">findall_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">keyword_pat</span><span class="p">,</span><span class="n">text</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+		<span class="n">findall_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">findall_list</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+		<span class="c1">#不符合re的匹配格式,直接返回原文本</span>
+	<span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;record_list&#39;</span><span class="p">:</span><span class="n">text</span><span class="p">}</span>
+	<span class="c1">#找不到目标也返回原来的文本</span>
+	<span class="k">if</span> <span class="n">findall_list</span> <span class="o">==</span> <span class="p">[]:</span>
+		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;record_list&#39;</span><span class="p">:</span><span class="n">text</span><span class="p">}</span>
+
+	<span class="c1">#需要保证所有都是字符串格式</span>
+	<span class="n">record_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+	<span class="c1">#记录不同颜色的关键词列表</span>
+	<span class="n">keyword_record_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keyword_dict</span><span class="p">:</span>
+		<span class="n">keyword_record_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+	<span class="k">while</span> <span class="n">findall_list</span><span class="p">:</span>
+		<span class="n">keyword</span> <span class="o">=</span> <span class="n">findall_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="n">target_index</span> <span class="o">=</span> <span class="n">split_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+
+		<span class="c1">#配合keyword_dict的小写</span>
+		<span class="c1">#keyword = keyword.lower()</span>
+		<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keyword_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">replace_re_special</span><span class="p">(</span><span class="n">keyword</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="ow">in</span> <span class="n">keyword_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+				<span class="n">keyword_record_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+				<span class="c1">#没有出现过的关键字才能继续写入，否则不做写入</span>
+				<span class="n">split_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">target_index</span><span class="p">,</span><span class="n">insert_dict</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()])</span>
+
+		<span class="c1">#按顺序记录</span>
+		<span class="n">record_list</span> <span class="o">+=</span> <span class="n">split_list</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">target_index</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+		<span class="n">split_list</span> <span class="o">=</span> <span class="n">split_list</span><span class="p">[</span><span class="n">target_index</span><span class="o">+</span><span class="mi">2</span><span class="p">:]</span>
+	<span class="c1">#记录最后一段,如果split_list 为空</span>
+	<span class="n">record_list</span> <span class="o">+=</span> <span class="n">split_list</span>
+	<span class="c1">#返回一个需要插入文字的record_list和一个命中关键词的keyword_record_dict {&#39;red&#39;:[&#39;blueteeth&#39;,&#39;face&#39;]}</span>
+
+	<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;record_list&#39;</span><span class="p">:</span><span class="n">record_list</span><span class="p">,</span><span class="s1">&#39;keyword_record_dict&#39;</span><span class="p">:</span><span class="n">keyword_record_dict</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="write_header"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.write_header">[文档]</a><span class="k">def</span> <span class="nf">write_header</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">header_column</span><span class="p">):</span>
+	<span class="k">for</span> <span class="n">column_index</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header_column</span><span class="p">):</span>
+		<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">column_index</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">xlsxwriter_ws</span></div>
+
+
+<div class="viewcode-block" id="get_insert_dict"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.get_insert_dict">[文档]</a><span class="k">def</span> <span class="nf">get_insert_dict</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">):</span>
+	<span class="n">insert_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">()</span>
+	<span class="c1">#高亮关键字格式  红色</span>
+	<span class="k">for</span> <span class="n">format_word</span><span class="p">,</span> <span class="n">k_list</span> <span class="ow">in</span> <span class="n">keyword_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+		<span class="c1">#区分颜色和字体粗体或斜体</span>
+		<span class="n">format_word</span> <span class="o">=</span> <span class="n">format_word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">format_word</span> <span class="o">==</span> <span class="s1">&#39;bold&#39;</span> <span class="p">:</span>
+			<span class="n">custom_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">})</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">custom_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_color&#39;</span><span class="p">:</span><span class="n">format_word</span><span class="p">})</span>
+		<span class="n">insert_dict</span><span class="p">[</span><span class="n">format_word</span><span class="p">]</span> <span class="o">=</span> <span class="n">custom_format</span>
+
+	<span class="k">return</span> <span class="n">insert_dict</span></div>
+
+<div class="viewcode-block" id="write2wb"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.write2wb">[文档]</a><span class="k">def</span> <span class="nf">write2wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">highlight_column_list</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">,</span><span class="n">highlight_column</span><span class="o">=</span><span class="s1">&#39;Text&#39;</span><span class="p">):</span>
+
+	<span class="c1">#获取insert_dict </span>
+	<span class="n">insert_dict</span> <span class="o">=</span> <span class="n">get_insert_dict</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">)</span>
+
+	<span class="n">new_highlight_name</span> <span class="o">=</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> With Macro&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">highlight_column</span><span class="p">)</span>
+
+	<span class="n">bold_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">})</span>
+	<span class="c1">#第一个sheet记录高亮关键词结果</span>
+	<span class="n">xlsxwriter_ws</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;highlight&#39;</span><span class="p">)</span>
+	<span class="n">xlsxwriter_ws_target</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="s1">&#39;keyword_matched&#39;</span><span class="p">)</span>
+	<span class="c1">#第一个sheet表头，只写一列即可,表头标黄色</span>
+	<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">new_highlight_name</span><span class="p">,</span><span class="n">bold_format</span><span class="p">)</span>
+
+	<span class="c1">#第二个sheet表头</span>
+	<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keyword_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+		<span class="n">xlsxwriter_ws_target</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">bold_format</span><span class="p">)</span>
+
+	<span class="n">total_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">highlight_column_list</span><span class="p">)</span>
+	
+	<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">row_index</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">highlight_column_list</span><span class="p">):</span>  <span class="c1">#[7743:7745]</span>
+		<span class="k">if</span>  <span class="p">(</span><span class="n">row_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2000</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">row_index</span> <span class="o">+</span> <span class="mi">1</span><span class="o">==</span> <span class="n">total_len</span><span class="p">)</span>  <span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; Processing...&#39;</span><span class="p">,</span><span class="n">row_index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="n">total_len</span><span class="p">)</span>
+
+		<span class="n">rich_param_dict</span> <span class="o">=</span> <span class="n">get_rich_param_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">,</span><span class="n">insert_dict</span><span class="p">)</span>
+
+		<span class="n">params</span> <span class="o">=</span> <span class="n">rich_param_dict</span><span class="p">[</span><span class="s1">&#39;record_list&#39;</span><span class="p">]</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+			<span class="n">params</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span> 
+
+		<span class="n">keyword_record_dict</span> <span class="o">=</span> <span class="n">rich_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;keyword_record_dict&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+		<span class="c1">#1.写入第一个文档的部分</span>
+		<span class="n">column_index</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row_index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">column_index</span><span class="p">,</span><span class="n">params</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">params</span><span class="p">:</span>  <span class="c1">#是列表格式并且不是空列表 </span>
+			<span class="n">success</span> <span class="o">=</span> <span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_rich_string</span><span class="p">(</span><span class="n">row_index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">column_index</span><span class="p">,</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>	
+			<span class="c1">#如果返回是-5代表列表只有两个元素，不能写入,需要把文本取出来重新写</span>
+			<span class="k">if</span> <span class="n">success</span> <span class="o">==</span> <span class="o">-</span><span class="mi">5</span><span class="p">:</span>
+				<span class="n">one_word_text</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+				<span class="n">success</span> <span class="o">=</span> <span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row_index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">column_index</span><span class="p">,</span><span class="n">one_word_text</span><span class="p">,</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row_index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">column_index</span><span class="p">,</span><span class="n">params</span><span class="p">)</span>
+
+		<span class="c1">#写入第二个sheet的部分，通过关键词字典提取目标关键词</span>
+		<span class="k">if</span> <span class="n">keyword_record_dict</span><span class="p">:</span>
+			<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span> 
+			<span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">keyword_record_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+				<span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;bold&#39;</span><span class="p">:</span>
+					<span class="n">cell_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">})</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">cell_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_color&#39;</span><span class="p">:</span><span class="n">k</span><span class="p">})</span>
+				<span class="n">column_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">keyword_record_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+				<span class="n">v_text</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+				<span class="n">xlsxwriter_ws_target</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row_index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">column_index</span><span class="p">,</span><span class="n">v_text</span><span class="p">,</span><span class="n">cell_format</span><span class="p">)</span>
+
+	<span class="c1">#调整每个列的宽度</span>
+	<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">width</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+	<span class="n">xlsxwriter_ws_target</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">keyword_dict</span><span class="p">),</span><span class="n">width</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="n">xlsxwriter_wb</span></div>
+
+<div class="viewcode-block" id="highlight"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.highlight">[文档]</a><span class="k">def</span> <span class="nf">highlight</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">xlrd_ws</span><span class="p">,</span><span class="n">highlight_column</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	可以自己选处理哪个内容</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="c1">#获取columns</span>
+	<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xlrd_ws</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+	<span class="c1">#定位第几列需要高亮</span>
+	<span class="n">highlight_column_index</span> <span class="o">=</span> <span class="n">columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">highlight_column</span><span class="p">)</span>
+	<span class="c1">#不取第一行</span>
+	<span class="n">highlight_column_series</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xlrd_ws</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">highlight_column_index</span><span class="p">)][</span><span class="mi">1</span><span class="p">:]</span>
+	<span class="n">xlsxwriter_wb</span> <span class="o">=</span> <span class="n">write2wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">highlight_column_series</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">,</span><span class="n">highlight_column</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="n">xlsxwriter_wb</span></div>
+
+<div class="viewcode-block" id="save_xlsxwriter_wb"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.save_xlsxwriter_wb">[文档]</a><span class="k">def</span> <span class="nf">save_xlsxwriter_wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">path</span><span class="p">):</span>
+	<span class="n">close_tag</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">while</span> <span class="n">close_tag</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+			<span class="n">close_tag</span> <span class="o">+=</span> <span class="mi">1</span> 
+		<span class="k">except</span> <span class="n">FileCreateError</span><span class="p">:</span>
+			<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Failed to write file!</span><span class="se">\n</span><span class="s1">  Please Close &quot;</span><span class="si">{}</span><span class="s1">&quot; Then Press Enter to Continue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+	<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{0}</span><span class="s1"> Saved&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="highlight_kw"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.highlight_kw.highlight_kw">[文档]</a><span class="k">def</span> <span class="nf">highlight_kw</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">):</span>
+
+	<span class="n">content_path</span> <span class="o">=</span> <span class="n">choose_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+	<span class="n">xlrd_wb</span><span class="p">,</span><span class="n">xlrd_ws</span><span class="p">,</span><span class="n">sheet_name</span><span class="p">,</span><span class="n">highlight_column</span> <span class="o">=</span> <span class="n">choose_sheet_column</span><span class="p">(</span><span class="n">content_path</span><span class="p">)</span>
+
+	<span class="n">new_path</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;(.*).(xlsx|xls|xlsm)$&#39;</span><span class="p">,</span><span class="n">content_path</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_Macro.xlsx&#39;</span>
+
+	<span class="n">xlsxwriter_wb</span> <span class="o">=</span> <span class="n">Workbook</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+	<span class="n">xlsxwriter_wb</span> <span class="o">=</span> <span class="n">highlight</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">xlrd_ws</span><span class="p">,</span><span class="n">highlight_column</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">)</span>
+
+	<span class="c1">#传过来只是为了关闭</span>
+	<span class="n">xlrd_wb</span><span class="o">.</span><span class="n">release_resources</span><span class="p">()</span>
+
+	<span class="n">save_xlsxwriter_wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">new_path</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span> <span class="p">:</span>
+	<span class="n">keyword_path</span> <span class="o">=</span> <span class="n">get_require_files</span><span class="p">(</span><span class="s1">&#39;.</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,[</span><span class="s2">&quot;keyword&quot;</span><span class="p">],</span><span class="n">if_walk_path</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s1">&#39;keyword&#39;</span><span class="p">]</span>
+
+	<span class="n">keyword_dict</span> <span class="o">=</span> <span class="n">get_keyword_dict</span><span class="p">(</span><span class="n">keyword_path</span><span class="p">)</span>
+
+	<span class="n">highlight_kw</span><span class="p">(</span><span class="s1">&#39;.</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">keyword_dict</span><span class="p">)</span>
+
+	<span class="nb">input</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Press Enter to Exit&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

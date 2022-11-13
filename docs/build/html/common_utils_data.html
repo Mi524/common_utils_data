@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data package &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">common_utils_data package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.config_table">common_utils_data.config_table module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.data_handle_func">common_utils_data.data_handle_func module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.data_handle_sheet_func">common_utils_data.data_handle_sheet_func module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.data_process_func">common_utils_data.data_process_func module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.data_statistic_func">common_utils_data.data_statistic_func module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.decorator_functions">common_utils_data.decorator_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.df_functions">common_utils_data.df_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.excel_functions">common_utils_data.excel_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.func_classes">common_utils_data.func_classes module</a></li>
+<li><a class="reference internal" href="#common-utils-data-get-sql-data-module">common_utils_data.get_sql_data module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.highlight_kw">common_utils_data.highlight_kw module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.information">common_utils_data.information module</a></li>
+<li><a class="reference internal" href="#common-utils-data-jupyter-functions-module">common_utils_data.jupyter_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.nlp_functions">common_utils_data.nlp_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.nltk_functions">common_utils_data.nltk_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.os_functions">common_utils_data.os_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.regex_functions">common_utils_data.regex_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.sequence_functions">common_utils_data.sequence_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data.sql_functions">common_utils_data.sql_functions module</a></li>
+<li><a class="reference internal" href="#module-common_utils_data">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">common_utils_data package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/common_utils_data.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="common-utils-data-package">
+<h1>common_utils_data package<a class="headerlink" href="#common-utils-data-package" title="永久链接至标题"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="永久链接至标题"></a></h2>
+</section>
+<section id="module-common_utils_data.config_table">
+<span id="common-utils-data-config-table-module"></span><h2>common_utils_data.config_table module<a class="headerlink" href="#module-common_utils_data.config_table" title="永久链接至标题"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="common_utils_data.config_table.ConfigReader">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">common_utils_data.config_table.</span></span><span class="sig-name descname"><span class="pre">ConfigReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/config_table.html#ConfigReader"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.config_table.ConfigReader" title="永久链接至目标"></a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.config_table.ConfigReader.get_complete_header_df">
+<span class="sig-name descname"><span class="pre">get_complete_header_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header_table_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/config_table.html#ConfigReader.get_complete_header_df"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.config_table.ConfigReader.get_complete_header_df" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.config_table.ConfigReader.get_config_tables">
+<span class="sig-name descname"><span class="pre">get_config_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">if_walk_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/config_table.html#ConfigReader.get_config_tables"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.config_table.ConfigReader.get_config_tables" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.config_table.ConfigReader.get_header_table">
+<span class="sig-name descname"><span class="pre">get_header_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header_table_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/config_table.html#ConfigReader.get_header_table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.config_table.ConfigReader.get_header_table" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-common_utils_data.data_handle_func">
+<span id="common-utils-data-data-handle-func-module"></span><h2>common_utils_data.data_handle_func module<a class="headerlink" href="#module-common_utils_data.data_handle_func" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_func.check_only_one_match_column">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_func.</span></span><span class="sig-name descname"><span class="pre">check_only_one_match_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">join_table_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_func.html#check_only_one_match_column"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_func.check_only_one_match_column" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_func.process_join_table">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_func.</span></span><span class="sig-name descname"><span class="pre">process_join_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">join_table_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_table_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_func.html#process_join_table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_func.process_join_table" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_func.process_match_complete_table">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_func.</span></span><span class="sig-name descname"><span class="pre">process_match_complete_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">complete_header_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_table_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_func.html#process_match_complete_table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_func.process_match_complete_table" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_func.replace_brackets2blank">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_func.</span></span><span class="sig-name descname"><span class="pre">replace_brackets2blank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_func.html#replace_brackets2blank"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_func.replace_brackets2blank" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_func.split_colon">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_func.</span></span><span class="sig-name descname"><span class="pre">split_colon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_func.html#split_colon"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_func.split_colon" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.data_handle_sheet_func">
+<span id="common-utils-data-data-handle-sheet-func-module"></span><h2>common_utils_data.data_handle_sheet_func module<a class="headerlink" href="#module-common_utils_data.data_handle_sheet_func" title="永久链接至标题"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.CsvSheetClass">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_sheet_func.</span></span><span class="sig-name descname"><span class="pre">CsvSheetClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_sheet_func.html#CsvSheetClass"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.CsvSheetClass" title="永久链接至目标"></a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">common_utils_data.data_handle_sheet_func.</span></span><span class="sig-name descname"><span class="pre">Handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">require_file_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_sheet_func.html#Handler"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler" title="永久链接至目标"></a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.calc_time">
+<span class="sig-name descname"><span class="pre">calc_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_process_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/data_handle_sheet_func.html#Handler.calc_time"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.calc_time" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.concat_data">
+<span class="sig-name descname"><span class="pre">concat_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.concat_data" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.drop_duplicate_data">
+<span class="sig-name descname"><span class="pre">drop_duplicate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.drop_duplicate_data" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.fill_and_sort_columns">
+<span class="sig-name descname"><span class="pre">fill_and_sort_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.fill_and_sort_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.filter_columns">
+<span class="sig-name descname"><span class="pre">filter_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.filter_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.get_original2cn_dict">
+<span class="sig-name descname"><span class="pre">get_original2cn_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.get_original2cn_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.match_columns">
+<span class="sig-name descname"><span class="pre">match_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.match_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.pivot_table">
+<span class="sig-name descname"><span class="pre">pivot_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.pivot_table" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.process_calculations">
+<span class="sig-name descname"><span class="pre">process_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.process_calculations" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.process_statistic_groups">
+<span class="sig-name descname"><span class="pre">process_statistic_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.process_statistic_groups" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.regex_extraction">
+<span class="sig-name descname"><span class="pre">regex_extraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.regex_extraction" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.split_columns">
+<span class="sig-name descname"><span class="pre">split_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.split_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.data_handle_sheet_func.Handler.standardize_columns">
+<span class="sig-name descname"><span class="pre">standardize_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#common_utils_data.data_handle_sheet_func.Handler.standardize_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-common_utils_data.data_process_func">
+<span id="common-utils-data-data-process-func-module"></span><h2>common_utils_data.data_process_func module<a class="headerlink" href="#module-common_utils_data.data_process_func" title="永久链接至标题"></a></h2>
+</section>
+<section id="module-common_utils_data.data_statistic_func">
+<span id="common-utils-data-data-statistic-func-module"></span><h2>common_utils_data.data_statistic_func module<a class="headerlink" href="#module-common_utils_data.data_statistic_func" title="永久链接至标题"></a></h2>
+</section>
+<section id="module-common_utils_data.decorator_functions">
+<span id="common-utils-data-decorator-functions-module"></span><h2>common_utils_data.decorator_functions module<a class="headerlink" href="#module-common_utils_data.decorator_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.decorator_functions.catch_and_print">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.decorator_functions.</span></span><span class="sig-name descname"><span class="pre">catch_and_print</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/decorator_functions.html#catch_and_print"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.decorator_functions.catch_and_print" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.decorator_functions.df_row_num_decorator">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.decorator_functions.</span></span><span class="sig-name descname"><span class="pre">df_row_num_decorator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/decorator_functions.html#df_row_num_decorator"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.decorator_functions.df_row_num_decorator" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.decorator_functions.get_run_time">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.decorator_functions.</span></span><span class="sig-name descname"><span class="pre">get_run_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/decorator_functions.html#get_run_time"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.decorator_functions.get_run_time" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.decorator_functions.log">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.decorator_functions.</span></span><span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/decorator_functions.html#log"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.decorator_functions.log" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.df_functions">
+<span id="common-utils-data-df-functions-module"></span><h2>common_utils_data.df_functions module<a class="headerlink" href="#module-common_utils_data.df_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.calc_percent">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">calc_percent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#calc_percent"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.calc_percent" title="永久链接至目标"></a></dt>
+<dd><p>每个数字列的都计算一个比率, 默认左边第一列是文字类型的列，默认不计算非数字类型的列
+:param df : 含有各个类别统计数值的表格，基本格式：第一列是类型，第二列是每个类型的数量，</p>
+<blockquote>
+<div><p>后面的列都是不同条件的数量，最后一行是总计</p>
+</div></blockquote>
+<p>:param total_column : 指定的总计列，会通过总计列决定从哪里开始计算每一列的比率
+:param calc_columns : 指定哪些列需要计算百分比结果
+:return new df with percentage counted new columns, if df is empty return None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.calc_total">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">calc_total</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#calc_total"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.calc_total" title="永久链接至目标"></a></dt>
+<dd><p>最后计算一行总计数量
+:param df : input df
+:return : new df that has the last row name total</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.check_abnormal_dates">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">check_abnormal_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_worksheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#check_abnormal_dates"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.check_abnormal_dates" title="永久链接至目标"></a></dt>
+<dd><p>检查日期是否为空，日期是否填写异常不能正常转换成pandas的datetime</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.column_gen_md5">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">column_gen_md5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_id_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MD5'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#column_gen_md5"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.column_gen_md5" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.convert_word_freq_dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">convert_word_freq_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#convert_word_freq_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.convert_word_freq_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.copy_seperate_header_columns">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">copy_seperate_header_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#copy_seperate_header_columns"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.copy_seperate_header_columns" title="永久链接至目标"></a></dt>
+<dd><p>外销国家字段对应.xlsx，把共同的国家部分拆分成多个相同列
+:param df :
+:param pattern :re pattern   ‘[A-Za-z]{2}’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.create_group_empty">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">create_group_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#create_group_empty"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.create_group_empty" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.delete_unnamed_behind">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">delete_unnamed_behind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#delete_unnamed_behind"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.delete_unnamed_behind" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.df_fillna_str">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">df_fillna_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#df_fillna_str"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.df_fillna_str" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.df_query">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">df_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#df_query"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.df_query" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.expand_stacked_column_to_list">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">expand_stacked_column_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#expand_stacked_column_to_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.expand_stacked_column_to_list" title="永久链接至目标"></a></dt>
+<dd><p>#为了统计蓝色部分字段，把故障类别堆积回到列表的状态
+:param df : 原语言拆分匹配后已经被展开的表格
+:param expand_column : 被展开过的字段
+:param unique_key : 唯一编码字段</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.expand_to_columns_pd">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">expand_to_columns_pd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#expand_to_columns_pd"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.expand_to_columns_pd" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.fill_header_period">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">fill_header_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'实销-个月'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#fill_header_period"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.fill_header_period" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.fillna_by_column">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">fillna_by_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_column_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#fillna_by_column"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.fillna_by_column" title="永久链接至目标"></a></dt>
+<dd><p>填充经过关联后 带有_x和_y的同名字段, 用右边填充左边的数据
+:param df
+:param same_column_name</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.fillna_with_dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">fillna_with_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#fillna_with_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.fillna_with_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.find_lack_columns">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">find_lack_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#find_lack_columns"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.find_lack_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.func_loc">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">func_loc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used_cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#func_loc"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.func_loc" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.generate_complete_index">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">generate_complete_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#generate_complete_index"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.generate_complete_index" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_2_columns_div">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_2_columns_div</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dividend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divisor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_2_columns_div"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_2_columns_div" title="永久链接至目标"></a></dt>
+<dd><p>计算一个表格两列字段相处的结果，并且将结果round两位小数点填充百分百展示
+:param df : input df
+:param dividend : 被除数  分子
+:param divisor :除数   分母</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_flashtext_processor">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_flashtext_processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_flashtext_processor"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_flashtext_processor" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_list_partial_sorted">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_list_partial_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'([^0-9]+)[0-9]{1,2}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_list_partial_sorted"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_list_partial_sorted" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_outer_join_diff">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_outer_join_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_outer_join_diff"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_outer_join_diff" title="永久链接至目标"></a></dt>
+<dd><p>参考：<a class="reference external" href="http://www.datasciencemadesimple.com/join-merge-data-frames-pandas-python/">http://www.datasciencemadesimple.com/join-merge-data-frames-pandas-python/</a>
+Pandas的outer join函数默认是full outer join,即返回的是全部两边都有的数据，求不相交的部分需要进行以下操作
+获取outer join结果集 减去 inner join 结果集 取得不相同的数据</p>
+<p>:param df list :  list containing two dataframes
+:param on : columns that used to join on
+:param left_right : indicates the name of each df in the df_list,will be added to the new_column nams
+return 两个表不相交的集合</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_rank_column">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_rank_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank_group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_rank_column"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_rank_column" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_target_sheet">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_target_sheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_target_sheet"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_target_sheet" title="永久链接至目标"></a></dt>
+<dd><p>通过Sheet名称获取目标Sheet，不读取隐藏的Sheet, 出现同名不同日期的Sheet优先读取后面最新的</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_target_sheet_wb">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_target_sheet_wb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workbook</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_target_sheet_wb"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_target_sheet_wb" title="永久链接至目标"></a></dt>
+<dd><p>通过Sheet名称获取目标Sheet，不读取隐藏的Sheet, 出现同名不同日期的Sheet优先读取后面最新的
+和get_target_sheet的区别在于传入的是一个workbook，并且最后不会关闭workbook（需要读取其他sheet）</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.get_year_month">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">get_year_month</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#get_year_month"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.get_year_month" title="永久链接至目标"></a></dt>
+<dd><p>检查</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.group_basic_agg">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">group_basic_agg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopword_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#group_basic_agg"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.group_basic_agg" title="永久链接至目标"></a></dt>
+<dd><p>根据分类统计基本的类别数量
+:param df : input df
+:param group_column : groupby column, list
+:param agg_function : same as df agg func
+:return :  dataframe contains agg result</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.group_by_concat">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">group_by_concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#group_by_concat"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.group_by_concat" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.group_dict_sum">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">group_dict_sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#group_dict_sum"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.group_dict_sum" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.group_word_count">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">group_word_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopword_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_keywords_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#group_word_count"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.group_word_count" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.merge_case_insensitive">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">merge_case_insensitive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">how</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#merge_case_insensitive"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.merge_case_insensitive" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.normalize_column_dates">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">normalize_column_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_worksheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#normalize_column_dates"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.normalize_column_dates" title="永久链接至目标"></a></dt>
+<dd><p>日期是否填写异常不能正常转换成pandas的datetime</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.normalize_dates">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">normalize_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_worksheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'默认'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'默认'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#normalize_dates"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.normalize_dates" title="永久链接至目标"></a></dt>
+<dd><p>检查日期是否为空，日期是否填写异常不能正常转换成pandas的datetime</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.normalize_dates_single">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">normalize_dates_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#normalize_dates_single"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.normalize_dates_single" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.normalize_multi_header">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">normalize_multi_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#normalize_multi_header"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.normalize_multi_header" title="永久链接至目标"></a></dt>
+<dd><p>将有MultiIndex的column字符串做标准化处理，去掉两边空格等</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.pivot2multi_tables">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">pivot2multi_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filt_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filt_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#pivot2multi_tables"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.pivot2multi_tables" title="永久链接至目标"></a></dt>
+<dd><p>将一个需要分N批次保存多个列数值的表摊开成N个
+:param index :same as pd.pivot index, regarding to the fix index column
+:param columns: the original column that needs to be expanded to the header row
+:param  value_list : the rest value columns corresponding to pd param values</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.process_enddate">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">process_enddate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#process_enddate"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.process_enddate" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.read_config_table">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">read_config_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_path</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'str'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#read_config_table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.read_config_table" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.read_data_file">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">read_data_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#read_data_file"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.read_data_file" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.regex_split_column">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">regex_split_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_pat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_symbol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#regex_split_column"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.regex_split_column" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.remove_duplicate_columns">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">remove_duplicate_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#remove_duplicate_columns"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.remove_duplicate_columns" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.set_index_drop_all">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">set_index_drop_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#set_index_drop_all"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.set_index_drop_all" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.split2multi_tables">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">split2multi_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#split2multi_tables"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.split2multi_tables" title="永久链接至目标"></a></dt>
+<dd><p>将一个表根据列维度拆分成多个表
+:param df : input df table
+:param index_list :
+:param column_list :</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.split_column_by_words">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">split_column_by_words</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_words_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'split'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#split_column_by_words"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.split_column_by_words" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.stack_columns_to_multi_row">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">stack_columns_to_multi_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_stack_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex_foramt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#stack_columns_to_multi_row"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.stack_columns_to_multi_row" title="永久链接至目标"></a></dt>
+<dd><p>将多个故障摊开的列以_id为主键，摊开成多行,
+默认最后几列表头中带有0,1,2,3之类的属于应该被叠起来的故障现象
+:param target_stack_name 转换的目标默认字段名
+:param regex_foramt
+return result df</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.stack_list_column">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">stack_list_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#stack_list_column"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.stack_list_column" title="永久链接至目标"></a></dt>
+<dd><p>:param df : dataframe to be processed
+:param split_column : list, column that need to be split and stack
+:param split_symbol : symbol(sign) used to split the specific column
+:return stacked Dataframe, specific list type column becomes string on each new row</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.df_functions.word_agg_func">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.df_functions.</span></span><span class="sig-name descname"><span class="pre">word_agg_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_func_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopword_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/df_functions.html#word_agg_func"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.df_functions.word_agg_func" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.excel_functions">
+<span id="common-utils-data-excel-functions-module"></span><h2>common_utils_data.excel_functions module<a class="headerlink" href="#module-common_utils_data.excel_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.adjust_pct_decimal_format">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">adjust_pct_decimal_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_number_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#adjust_pct_decimal_format"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.adjust_pct_decimal_format" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.autofit_column_width">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">autofit_column_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrap_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#autofit_column_width"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.autofit_column_width" title="永久链接至目标"></a></dt>
+<dd><p>根据表头的字符长度自动调整EXCEL表头的列宽
+content_columns是专门给特长的列加宽</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.df_sheet_check">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">df_sheet_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#df_sheet_check"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.df_sheet_check" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.format_custom_cells">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">format_custom_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">worksheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_cells_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_cell_color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#format_custom_cells"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.format_custom_cells" title="永久链接至目标"></a></dt>
+<dd><p>处理特殊的单元格
+:param custom_cells_dict :默认key代表要修改的sheet_name,value是list类型，第一个元素是列，第二个元素的行
+:custom_cell_color: 指定单元格的字体颜色</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.format_table">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">format_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">worksheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_style</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#format_table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.format_table" title="永久链接至目标"></a></dt>
+<dd><p>传入worksheet进行统一格式调整后返回worksheet对象
+:param worksheet :openpyxl worksheet
+:param format_style : 1/text or 2/data ,default is None
+:param wrap_text : the column letter you want to have auto line break, default is None
+:header_color : rgb value in list format, None is transparent, ‘default’ is light blue</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.get_column_row_num">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">get_column_row_num</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">worksheet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#get_column_row_num"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.get_column_row_num" title="永久链接至目标"></a></dt>
+<dd><p>calculate the number of columns and rows from a worksheet
+:param worksheet: openpyxl worksheet
+:return : column_letters, row_numbers</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.pd_save_excel">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">pd_save_excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startrow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startcol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#pd_save_excel"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.pd_save_excel" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.refresh_excel_calculations">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">refresh_excel_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#refresh_excel_calculations"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.refresh_excel_calculations" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.replace_invalid_strs">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">replace_invalid_strs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#replace_invalid_strs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.replace_invalid_strs" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.rgb_convert_hex">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">rgb_convert_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#rgb_convert_hex"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.rgb_convert_hex" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.save_csv">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">save_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#save_csv"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.save_csv" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.save_excel">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">save_excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#save_excel"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.save_excel" title="永久链接至目标"></a></dt>
+<dd><p>通过openpyxl写入pandas表格，可以修改写入格式
+:param df_list : df list need to write
+:param save_path : target path
+:param sheet_name_list : sheet_names coresponding to df_list
+:param format_style : default is None, bolded header;  text or 1  (change header format</p>
+<blockquote>
+<div><p>and column width only); ‘data’ or 2 adjust the header and the first column</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.save_xlsxwriter_wb">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">save_xlsxwriter_wb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_wb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#save_xlsxwriter_wb"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.save_xlsxwriter_wb" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.write_format_columns">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">write_format_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pct_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#write_format_columns"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.write_format_columns" title="永久链接至目标"></a></dt>
+<dd><p>给定一个表格，用百分比写入包含指定文字的列,表头wrap_text, 添加选项,上面write_pct_columns方式不写是不希望每列str都变成text格式，
+正常应该是常规格式
+基本和前面的write_pct_columns相同，区别在于加上了整列如果都是str用text格式写入的方式</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.write_multi_tables">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">write_multi_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_wb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#write_multi_tables"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.write_multi_tables" title="永久链接至目标"></a></dt>
+<dd><p>将多个小型数据表写入一个sheet里面
+0/horizontal 从上往下顺序写入，1/vertical 从左往右顺序写入
+有额外的kwargs参数，方便输入遇到哪个字符串就用百分比格式</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.write_pct_columns">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">write_pct_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pct_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#write_pct_columns"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.write_pct_columns" title="永久链接至目标"></a></dt>
+<dd><p>给定一个表格，用百分比写入包含指定文字的列,表头wrap_text, 添加选项</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.excel_functions.write_row_format">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.excel_functions.</span></span><span class="sig-name descname"><span class="pre">write_row_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/excel_functions.html#write_row_format"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.excel_functions.write_row_format" title="永久链接至目标"></a></dt>
+<dd><p>fit in row or col parameter to write_row method according to direction param
+:param row : start row zero indexed
+:param col : start col zero indexed
+:param pct_format : how to display num_format
+:param direction : 1/horizontal ，0/vertical</p>
+</dd></dl>
+
+</section>
+<section id="module-common_utils_data.func_classes">
+<span id="common-utils-data-func-classes-module"></span><h2>common_utils_data.func_classes module<a class="headerlink" href="#module-common_utils_data.func_classes" title="永久链接至标题"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="common_utils_data.func_classes.DfDict">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">common_utils_data.func_classes.</span></span><span class="sig-name descname"><span class="pre">DfDict</span></span><a class="reference internal" href="_modules/common_utils_data/func_classes.html#DfDict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.func_classes.DfDict" title="永久链接至目标"></a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="common_utils_data.func_classes.DfDict.sum">
+<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/func_classes.html#DfDict.sum"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.func_classes.DfDict.sum" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="common-utils-data-get-sql-data-module">
+<h2>common_utils_data.get_sql_data module<a class="headerlink" href="#common-utils-data-get-sql-data-module" title="永久链接至标题"></a></h2>
+</section>
+<section id="module-common_utils_data.highlight_kw">
+<span id="common-utils-data-highlight-kw-module"></span><h2>common_utils_data.highlight_kw module<a class="headerlink" href="#module-common_utils_data.highlight_kw" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.get_insert_dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">get_insert_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_wb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#get_insert_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.get_insert_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.get_keyword_dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">get_keyword_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#get_keyword_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.get_keyword_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.get_rich_param_list">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">get_rich_param_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#get_rich_param_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.get_rich_param_list" title="永久链接至目标"></a></dt>
+<dd><p>通过文本和关键词获取需要填入xlsxwriter write_rich_string的第三个内容/param的格式,忽略大小写,re.I
+:param text:
+:param keyword_list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.highlight">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">highlight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_wb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlrd_ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#highlight"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.highlight" title="永久链接至目标"></a></dt>
+<dd><p>可以自己选处理哪个内容</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.highlight_kw">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">highlight_kw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#highlight_kw"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.highlight_kw" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.replace_re_special">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">replace_re_special</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#replace_re_special"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.replace_re_special" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.save_xlsxwriter_wb">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">save_xlsxwriter_wb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_wb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#save_xlsxwriter_wb"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.save_xlsxwriter_wb" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.write2wb">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">write2wb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_wb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_column_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Text'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#write2wb"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.write2wb" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.highlight_kw.write_header">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.highlight_kw.</span></span><span class="sig-name descname"><span class="pre">write_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlsxwriter_ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/highlight_kw.html#write_header"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.highlight_kw.write_header" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.information">
+<span id="common-utils-data-information-module"></span><h2>common_utils_data.information module<a class="headerlink" href="#module-common_utils_data.information" title="永久链接至标题"></a></h2>
+</section>
+<section id="common-utils-data-jupyter-functions-module">
+<h2>common_utils_data.jupyter_functions module<a class="headerlink" href="#common-utils-data-jupyter-functions-module" title="永久链接至标题"></a></h2>
+</section>
+<section id="module-common_utils_data.nlp_functions">
+<span id="common-utils-data-nlp-functions-module"></span><h2>common_utils_data.nlp_functions module<a class="headerlink" href="#module-common_utils_data.nlp_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.convert_key2list">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">convert_key2list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#convert_key2list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.convert_key2list" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.encript_email_pat">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">encript_email_pat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#encript_email_pat"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.encript_email_pat" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.encript_number_pat">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">encript_number_pat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#encript_number_pat"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.encript_number_pat" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.get_keyword_dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">get_keyword_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#get_keyword_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.get_keyword_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.get_stopword_list">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">get_stopword_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stopwords_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#get_stopword_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.get_stopword_list" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.get_word_freq_dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">get_word_freq_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopword_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_keywords_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#get_word_freq_dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.get_word_freq_dict" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.process_text_eng">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">process_text_eng</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopword_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_keywords_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#process_text_eng"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.process_text_eng" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.remove_numbers">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">remove_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#remove_numbers"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.remove_numbers" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.remove_one_letter">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">remove_one_letter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#remove_one_letter"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.remove_one_letter" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nlp_functions.remove_stopwords">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nlp_functions.</span></span><span class="sig-name descname"><span class="pre">remove_stopwords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stopword_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nlp_functions.html#remove_stopwords"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nlp_functions.remove_stopwords" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.nltk_functions">
+<span id="common-utils-data-nltk-functions-module"></span><h2>common_utils_data.nltk_functions module<a class="headerlink" href="#module-common_utils_data.nltk_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nltk_functions.convert_list2dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nltk_functions.</span></span><span class="sig-name descname"><span class="pre">convert_list2dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nltk_functions.html#convert_list2dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nltk_functions.convert_list2dict" title="永久链接至目标"></a></dt>
+<dd><p>把列表写成字典</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.nltk_functions.gen_valid_wordlist">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.nltk_functions.</span></span><span class="sig-name descname"><span class="pre">gen_valid_wordlist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid_word_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/nltk_functions.html#gen_valid_wordlist"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.nltk_functions.gen_valid_wordlist" title="永久链接至目标"></a></dt>
+<dd><p>创建有效的单词列表,全部返回小写</p>
+</dd></dl>
+
+</section>
+<section id="module-common_utils_data.os_functions">
+<span id="common-utils-data-os-functions-module"></span><h2>common_utils_data.os_functions module<a class="headerlink" href="#module-common_utils_data.os_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.check_create_new_folder">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">check_create_new_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_or_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#check_create_new_folder"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.check_create_new_folder" title="永久链接至目标"></a></dt>
+<dd><p>检查是否存在某个文件夹，或者输入的文件所在的目录是否存在，如果不存在话 就生成新的文件夹</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.check_require_files">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">check_require_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_name_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#check_require_files"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.check_require_files" title="永久链接至目标"></a></dt>
+<dd><p>检查某个路径是否包含必须的文档
+:param path:路径
+:param require_name_list: 要检查的文档/文件夹是否存在
+:param regex : 是否需要用re去匹配</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.choose_file">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">choose_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.\\\\'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#choose_file"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.choose_file" title="永久链接至目标"></a></dt>
+<dd><p>提供选项选择读取处理哪个EXCEL文档sheet,处理哪个字段,默认处理main_body</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.choose_folder">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">choose_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.\\\\'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#choose_folder"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.choose_folder" title="永久链接至目标"></a></dt>
+<dd><p>#参考choose_file 函数，除了选的是文件夹，其他地方都一样
+提供选项选择读取处理哪个EXCEL文档sheet,处理哪个字段,默认处理main_body</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.choose_sheet_column">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">choose_sheet_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#choose_sheet_column"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.choose_sheet_column" title="永久链接至目标"></a></dt>
+<dd><p>打开文档选择sheeth和column,并且返回一个worksheet内容,方便后面使用</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.enter_exit">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">enter_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#enter_exit"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.enter_exit" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.generate_md5">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">generate_md5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#generate_md5"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.generate_md5" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_folder_list">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_folder_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.\\'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_folder_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_folder_list" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_most_upper_level_path">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_most_upper_level_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_most_upper_level_path"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_most_upper_level_path" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_require_file_list">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_require_file_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_file_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_part</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xls'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">if_walk_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_require_file_list"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_require_file_list" title="永久链接至目标"></a></dt>
+<dd><p>检查某个路径是否包含必须的文档
+:param path:路径
+:param require_file_list: 要检查的文档/文件夹是否存在
+:param regex : 是否需要用re去匹配
+:return : 如果不存在，返回空字典，如果文档存在 返回需要文档的对应绝对路径字典</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_require_files">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_require_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_file_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matched_part</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xls'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">if_walk_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_require_files"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_require_files" title="永久链接至目标"></a></dt>
+<dd><p>检查某个路径是否包含必须的文档
+:param path:路径
+:param require_file_list: 要检查的文档/文件夹是否存在
+:param regex : 是否需要用re去匹配
+:return : 如果不存在，返回空字典，如果文档存在 返回需要文档的对应绝对路径字典</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_walk_abs_files">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_walk_abs_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_walk_abs_files"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_walk_abs_files" title="永久链接至目标"></a></dt>
+<dd><p>填入文件夹位置获取该目录和其子目录下的所有文件列表,获取的绝对路径
+:param path
+return a list of files inside the path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_walk_files">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_walk_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_walk_files"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_walk_files" title="永久链接至目标"></a></dt>
+<dd><p>填入文件夹位置获取该目录和其子目录下的所有文件列表,获取的相对路径
+:param path
+return a list of files inside the path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.get_walk_folders">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">get_walk_folders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#get_walk_folders"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.get_walk_folders" title="永久链接至目标"></a></dt>
+<dd><p>填入文件夹路径获取该目录和其子目录下的所有文件夹列表
+:param path
+return a list of folders inside the path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.last_day_of_month">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">last_day_of_month</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">any_day</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#last_day_of_month"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.last_day_of_month" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.os_functions.partial_filename_path">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.os_functions.</span></span><span class="sig-name descname"><span class="pre">partial_filename_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefered_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/os_functions.html#partial_filename_path"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.os_functions.partial_filename_path" title="永久链接至目标"></a></dt>
+<dd><p>通过部分文件名定位到其中一份文件</p>
+</dd></dl>
+
+</section>
+<section id="module-common_utils_data.regex_functions">
+<span id="common-utils-data-regex-functions-module"></span><h2>common_utils_data.regex_functions module<a class="headerlink" href="#module-common_utils_data.regex_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.check_syn_str_regex">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">check_syn_str_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">special_syn_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#check_syn_str_regex"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.check_syn_str_regex" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.check_syn_str_regex_number">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">check_syn_str_regex_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">special_syn_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#check_syn_str_regex_number"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.check_syn_str_regex_number" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.get_keyword_pat">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">get_keyword_pat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyword_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#get_keyword_pat"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.get_keyword_pat" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.normalize_punctuations">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">normalize_punctuations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#normalize_punctuations"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.normalize_punctuations" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.number_similarity">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">number_similarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#number_similarity"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.number_similarity" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.partial_match_pct">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">partial_match_pct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">short_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">special_syn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['pro',</span> <span class="pre">'plus',</span> <span class="pre">'max',</span> <span class="pre">'youth']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#partial_match_pct"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.partial_match_pct" title="永久链接至目标"></a></dt>
+<dd><p>short_str : original string
+long_str : standard target string
+匹配机型，不要放入两个一样的字符串，获取短字符串在长字符串中是否存在，并且占了多少个字符,
+从开头开始匹配,不替换空格不用in的方式查找，带有括号的机型匹配优先级最高，
+通常Y15S和Y15(4+64G)后者更容易被缩写成Y15</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.re_findall_replace">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">re_findall_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_symbols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('-',</span> <span class="pre">'_')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#re_findall_replace"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.re_findall_replace" title="永久链接至目标"></a></dt>
+<dd><p>当re.sub(pattern,repl,string)内置的repl = “g&lt;1&gt;” 不能满足替换需求的时候,
+比如需要将group目标内的文字中的某个符号替换掉,并且需要match多个group目标</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.re_findall_sub">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">re_findall_sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_symbols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('-',</span> <span class="pre">'_')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#re_findall_sub"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.re_findall_sub" title="永久链接至目标"></a></dt>
+<dd><p>当re.sub(pattern,repl,string)内置的repl = “g&lt;1&gt;” 不能满足替换需求的时候,
+比如</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.re_sub_replace">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">re_sub_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repace_symbols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('-',</span> <span class="pre">'_')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#re_sub_replace"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.re_sub_replace" title="永久链接至目标"></a></dt>
+<dd><p>当re.sub(pattern,repl,string)内置的repl = “g&lt;1&gt;” 不能满足替换需求的时候,
+比如需要将group目标内的文字中的某个符号替换掉, 使用的时候要注意替换代码内的sub replace符号
+:param pattern : re pattern
+:param string : original string</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.replace_multi_symbol">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">replace_multi_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#replace_multi_symbol"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.replace_multi_symbol" title="永久链接至目标"></a></dt>
+<dd><p>把多个符号替换成单个，比如多个换行符 替换成 一个换行符,replace(’</p>
+<p>‘,’
+‘)并不能解决问题</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.replace_punctuations">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">replace_punctuations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_to_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#replace_punctuations"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.replace_punctuations" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.replace_re_special">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">replace_re_special</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#replace_re_special"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.replace_re_special" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.search_en">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">search_en</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combine_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#search_en"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.search_en" title="永久链接至目标"></a></dt>
+<dd><p>提取出中英文混合字符串中的英文部分</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.split_wrong_combine">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">split_wrong_combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#split_wrong_combine"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.split_wrong_combine" title="永久链接至目标"></a></dt>
+<dd><blockquote>
+<div><p>需要处理爬虫换行符的问题, 抓取的时候把换行符去掉了，导致单词连接成错误的形式
+比如 axxBx, AxxxCONs, usagePROgreat, slow3.Great sunglass</p>
+<blockquote>
+<div><p>(注意 3app , 3PlayStore只能算是拼写错误，不需要拆分, LED3 拆不了，陷入无限循环)</p>
+</div></blockquote>
+<p>需要将两个错误合并的单词用换行符替换拆分,
+:param pattern : the original pattern that we want to find out
+:param sub_pattern : sub pattern to extract from pattern,
+will be replaced with original + ‘</p>
+</div></blockquote>
+<p>‘ or ‘
+‘ + original</p>
+<blockquote>
+<div><p>:param string : target string
+e.g
+pattern = ‘[A-Z]?[a-z]+[A-Z0-9]+[a-zA-Z]*’
+sub_pattern = ‘[A-Z0-9]+[a-z]*’</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.strB2Q">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">strB2Q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ustring</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#strB2Q"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.strB2Q" title="永久链接至目标"></a></dt>
+<dd><p>把字符串半角转全角</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.strQ2B">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">strQ2B</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ustring</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#strQ2B"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.strQ2B" title="永久链接至目标"></a></dt>
+<dd><p>把字符串全角转半角</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.strip_puntuations">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">strip_puntuations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#strip_puntuations"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.strip_puntuations" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.regex_functions.symbol_to_spaces">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.regex_functions.</span></span><span class="sig-name descname"><span class="pre">symbol_to_spaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/regex_functions.html#symbol_to_spaces"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.regex_functions.symbol_to_spaces" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.sequence_functions">
+<span id="common-utils-data-sequence-functions-module"></span><h2>common_utils_data.sequence_functions module<a class="headerlink" href="#module-common_utils_data.sequence_functions" title="永久链接至标题"></a></h2>
+<p>list , dict , itertools, Counter functions</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.convert_twolist2dict">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">convert_twolist2dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#convert_twolist2dict"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.convert_twolist2dict" title="永久链接至目标"></a></dt>
+<dd><p>将两个列表转成字典形式</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.duplicate_elem_add_seq">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">duplicate_elem_add_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#duplicate_elem_add_seq"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.duplicate_elem_add_seq" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.filter_lcs">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">filter_lcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#filter_lcs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.filter_lcs" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.find_sublist_indexes">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">find_sublist_indexes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">complete_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#find_sublist_indexes"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.find_sublist_indexes" title="永久链接至目标"></a></dt>
+<dd><p>从完整大列表中搜索出小的子列表 从头到尾 在大列表中对应的索引（优先第一个元素,可以求出前中后的所有索引位置
+[a,b,c,d,e] –&gt; [b,d,e]  –&gt;  [1,3,4]  –&gt; result range_index_dict
+:param complete_list:
+:param sub_list
+:return :</p>
+<blockquote>
+<div><p>range_index_dict = {</p>
+</div></blockquote>
+<p>‘sub_list_index’:record_index_list,
+‘pre_range_index’:pre_range_index_list,
+‘mid_range_index’:mid_range_index_list,
+‘back_range_index’:back_range_index_list
+}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.find_sublists_seq">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">find_sublists_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#find_sublists_seq"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.find_sublists_seq" title="永久链接至目标"></a></dt>
+<dd><p>获取一个完整列表的所有有序子列表的组成可能,
+[3, 4, 3, 5, 6] –&gt;
+[[3, 4], 3, 5, 6]
+[3, [4, 3], 5, 6]
+[3, 4, [3, 5], 6]
+[3, 4, 3, [5, 6]]
+例如：not up to mark  notuptomark，not good –&gt; notgood</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.forward_fill">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">forward_fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#forward_fill"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.forward_fill" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.lcs">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">lcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#lcs"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.lcs" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.list_diff_outer_join">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">list_diff_outer_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">split_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">findall_result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#list_diff_outer_join"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.list_diff_outer_join" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.list_transpose">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">list_transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#list_transpose"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.list_transpose" title="永久链接至目标"></a></dt>
+<dd><p>列表转置</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.recursive_find_nodes">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">recursive_find_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parrent_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#recursive_find_nodes"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.recursive_find_nodes" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.recursive_gen_nodecodes">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">recursive_gen_nodecodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parrent_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_counter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#recursive_gen_nodecodes"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.recursive_gen_nodecodes" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.sublist_combinations_all">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">sublist_combinations_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#sublist_combinations_all"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.sublist_combinations_all" title="永久链接至目标"></a></dt>
+<dd><p>获取一个完整列表的所有有序子列表的组成可能</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sequence_functions.uneven_list_dictify">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sequence_functions.</span></span><span class="sig-name descname"><span class="pre">uneven_list_dictify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sequence_functions.html#uneven_list_dictify"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sequence_functions.uneven_list_dictify" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-common_utils_data.sql_functions">
+<span id="common-utils-data-sql-functions-module"></span><h2>common_utils_data.sql_functions module<a class="headerlink" href="#module-common_utils_data.sql_functions" title="永久链接至标题"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.close_sql_connection">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">close_sql_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#close_sql_connection"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.close_sql_connection" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.convert_fetchall2df">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">convert_fetchall2df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fetchall_result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#convert_fetchall2df"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.convert_fetchall2df" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.execute_fetchall">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">execute_fetchall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#execute_fetchall"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.execute_fetchall" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.execute_fetchall_engine">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">execute_fetchall_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#execute_fetchall_engine"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.execute_fetchall_engine" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.execute_updates_engine">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">execute_updates_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#execute_updates_engine"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.execute_updates_engine" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.gen_engine_text">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">gen_engine_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#gen_engine_text"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.gen_engine_text" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.get_alter_index_text">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">get_alter_index_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#get_alter_index_text"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.get_alter_index_text" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.get_connection_by_config">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">get_connection_by_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mysql'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'connection_config.ini'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#get_connection_by_config"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.get_connection_by_config" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.get_sql_connection">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">get_sql_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#get_sql_connection"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.get_sql_connection" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.get_sql_data">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">get_sql_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">how</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#get_sql_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.get_sql_data" title="永久链接至目标"></a></dt>
+<dd><p>通过SQL获取到目标数据并保存到文档</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.get_sql_result">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">get_sql_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#get_sql_result"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.get_sql_result" title="永久链接至目标"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.insert_update_table">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">insert_update_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#insert_update_table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.insert_update_table" title="永久链接至目标"></a></dt>
+<dd><p>检查表的主键字段，根据主键字段，采用update的方式更新数据</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.load_sql_data">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">load_sql_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">if_truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#load_sql_data"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.load_sql_data" title="永久链接至目标"></a></dt>
+<dd><p>write csv file into table</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="common_utils_data.sql_functions.write2table">
+<span class="sig-prename descclassname"><span class="pre">common_utils_data.sql_functions.</span></span><span class="sig-name descname"><span class="pre">write2table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">how</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/common_utils_data/sql_functions.html#write2table"><span class="viewcode-link"><span class="pre">[源代码]</span></span></a><a class="headerlink" href="#common_utils_data.sql_functions.write2table" title="永久链接至目标"></a></dt>
+<dd><dl>
+<dt>4种方式写入: 1.normal: 直接写入，可选参数是否清空原有表；</dt><dd><blockquote>
+<div><p>2.complete_rewrite: 删除原有的所有数据，并整个写入新数据
+3.mysql_load：直接通过mysql_load 方式写入 (这个方式经测试已经非常快，不用再重建索引也很快)</p>
+</div></blockquote>
+<p>（适用于特别大的数据集, 都需要确保MYSQL已经有完整的表结构）</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-common_utils_data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-common_utils_data" title="永久链接至标题"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

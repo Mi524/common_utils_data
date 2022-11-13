@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.excel_functions &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.excel_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.excel_functions 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">openpyxl</span> <span class="kn">import</span> <span class="n">Workbook</span> <span class="k">as</span> <span class="n">openpyxl_workbook</span>
+<span class="kn">from</span> <span class="nn">openpyxl.styles</span> <span class="kn">import</span> <span class="n">Color</span><span class="p">,</span><span class="n">PatternFill</span><span class="p">,</span><span class="n">Side</span><span class="p">,</span> <span class="n">Font</span><span class="p">,</span> <span class="n">Border</span><span class="p">,</span><span class="n">Alignment</span>
+<span class="kn">from</span> <span class="nn">openpyxl.utils</span> <span class="kn">import</span> <span class="n">get_column_letter</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter.exceptions</span> <span class="kn">import</span> <span class="n">FileCreateError</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter</span> <span class="kn">import</span> <span class="n">Workbook</span>
+<span class="kn">from</span> <span class="nn">.os_functions</span> <span class="kn">import</span> <span class="n">check_create_new_folder</span>
+<span class="kn">from</span> <span class="nn">.sequence_functions</span> <span class="kn">import</span> <span class="n">duplicate_elem_add_seq</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">import</span> <span class="nn">datetime</span> 
+<span class="kn">import</span> <span class="nn">re</span> 
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">math</span> 
+<span class="kn">import</span> <span class="nn">warnings</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xlwings</span> <span class="k">as</span> <span class="nn">xw</span> 
+
+<span class="kn">from</span> <span class="nn">pandas.core.indexes.multi</span> <span class="kn">import</span> <span class="n">MultiIndex</span>
+
+<span class="sd">&quot;&quot;&quot;pandas save_excel &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="pd_save_excel"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.pd_save_excel">[文档]</a><span class="k">def</span> <span class="nf">pd_save_excel</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">save_path</span><span class="p">,</span><span class="n">startrow</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">startcol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+
+	<span class="n">close_tag</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">while</span> <span class="n">close_tag</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">startrow</span><span class="o">=</span><span class="n">startrow</span><span class="p">,</span><span class="n">startcol</span><span class="o">=</span><span class="n">startcol</span><span class="p">)</span>
+			<span class="n">close_tag</span> <span class="o">+=</span> <span class="mi">1</span> 
+		<span class="k">except</span> <span class="p">(</span><span class="ne">PermissionError</span><span class="p">,</span><span class="n">FileCreateError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span> <span class="p">:</span>
+			<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Failed to write file!</span><span class="se">\n</span><span class="s1">  Please Close &quot;</span><span class="si">{}</span><span class="s1">&quot; Then Press Enter to Continue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span>
+	<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> Saved&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span></div>
+
+<span class="sd">&quot;&quot;&quot;这里主要是xlsxwriter的方法&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="autofit_column_width"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.autofit_column_width">[文档]</a><span class="k">def</span> <span class="nf">autofit_column_width</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">header_columns</span><span class="p">,</span><span class="n">content_columns</span><span class="o">=</span><span class="p">[],</span><span class="n">wrap_text</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;根据表头的字符长度自动调整EXCEL表头的列宽</span>
+<span class="sd">	   content_columns是专门给特长的列加宽</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">min_column_width</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;min_column_width&#39;</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+
+	<span class="n">cn_pat</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="se">\u4e00</span><span class="s2">-</span><span class="se">\u9fa5</span><span class="s2">]+&quot;</span>
+	<span class="n">en_pat</span> <span class="o">=</span> <span class="s2">&quot;[^</span><span class="se">\u4e00</span><span class="s2">-</span><span class="se">\u9fa5</span><span class="s2">]+&quot;</span>
+
+	<span class="c1">#先统一把表头转成文字格式</span>
+	<span class="n">header_columns</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header_columns</span><span class="p">]</span>
+
+	<span class="k">if</span> <span class="n">wrap_text</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+		<span class="n">length_list</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">len</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">cn_pat</span><span class="p">,</span><span class="n">c</span><span class="p">)))</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">en_pat</span><span class="p">,</span><span class="n">c</span><span class="p">)))</span><span class="o">*</span><span class="mi">1</span>  <span class="o">+</span> <span class="mi">4</span> \
+							<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">header_columns</span><span class="p">)]</span> 
+		<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">width</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">length_list</span><span class="p">):</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">width</span><span class="p">)</span>
+		<span class="c1">#防止最后一列没修改成功</span>
+		<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">width</span><span class="p">)</span>
+
+	<span class="k">else</span><span class="p">:</span> <span class="c1">#如果采用wrap_text方式，计算两层的中文wrap结果 </span>
+		<span class="n">length_list</span> <span class="o">=</span> <span class="p">[</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">cn_pat</span><span class="p">,</span><span class="n">c</span><span class="p">)))</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> \
+						<span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">en_pat</span><span class="p">,</span><span class="n">c</span><span class="p">)))</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> \
+							<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">header_columns</span><span class="p">)]</span> 
+
+		<span class="c1">#确保每列的宽度至少是4 </span>
+		<span class="n">length_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">min_column_width</span> <span class="k">else</span> <span class="n">min_column_width</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">length_list</span> <span class="p">]</span>
+
+		<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">width</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">length_list</span><span class="p">):</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">width</span><span class="p">)</span>
+		<span class="c1">#防止最后一列没修改成功</span>
+		<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">width</span><span class="p">)</span>
+
+	<span class="c1">#给特别的内容列加宽</span>
+	<span class="k">if</span> <span class="n">content_columns</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">content_columns</span><span class="p">:</span>
+			<span class="n">c_index</span> <span class="o">=</span> <span class="n">header_columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">c_index</span><span class="p">,</span><span class="n">c_index</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="adjust_pct_decimal_format"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.adjust_pct_decimal_format">[文档]</a><span class="k">def</span> <span class="nf">adjust_pct_decimal_format</span><span class="p">(</span><span class="n">original_number_format</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+	<span class="c1">#如果某一行/列的数据数字50%及以上的部分到第二个百分点无法区分上升或下降,比如0.001%, 0.002%</span>
+	<span class="c1">#保留2个小数点,四舍五入都是约等于0.00%,则往下一级去扩展保留更多的小数点位数</span>
+	<span class="n">original_decimal</span> <span class="o">=</span> <span class="n">original_number_format</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="n">original_decimal</span> <span class="p">:</span>
+		<span class="n">original_decimal_places</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_decimal</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">original_decimal_places</span> <span class="o">=</span> <span class="mi">2</span>
+
+	<span class="c1">#找到该列数据小数点最长的数字的小数点位数</span>
+	<span class="n">biggest_decimal_places</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">as_tuple</span><span class="p">()</span><span class="o">.</span><span class="n">exponent</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="nb">float</span> <span class="p">])</span>
+
+	<span class="c1">#当约到某一位的数字超过50%时，加一个小数位</span>
+	<span class="n">data_decimal_check</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">original_decimal_places</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="nb">float</span> <span class="p">]</span>
+
+	<span class="c1">#众数的数量如果超过50%</span>
+	<span class="n">mode_counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">data_decimal_check</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="n">mode</span> <span class="o">=</span> <span class="n">mode_counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="n">mode_counter</span> <span class="o">=</span> <span class="n">mode_counter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+	
+	<span class="n">mode_decimal_places</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span><span class="o">.</span><span class="n">as_tuple</span><span class="p">()</span><span class="o">.</span><span class="n">exponent</span><span class="p">)</span>
+
+	<span class="c1">#不能把original_decimal_format直接赋值给next_decimal_format,不可修改</span>
+	<span class="n">next_decimal_format</span> <span class="o">=</span> <span class="n">original_number_format</span>
+
+	<span class="k">if</span>  <span class="n">biggest_decimal_places</span> <span class="o">&gt;</span> <span class="n">original_decimal_places</span> <span class="ow">and</span> <span class="n">mode_counter</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data_decimal_check</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">:</span>
+		<span class="n">next_decimal_format</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">original_decimal_places</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="n">next_decimal_format</span> <span class="o">=</span> <span class="s1">&#39;0.</span><span class="si">{}</span><span class="s1">%&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">next_decimal_format</span><span class="p">)</span>
+
+		<span class="n">next_decimal_format</span> <span class="o">=</span> <span class="n">adjust_pct_decimal_format</span><span class="p">(</span><span class="n">next_decimal_format</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="n">next_decimal_format</span></div>
+
+<div class="viewcode-block" id="write_row_format"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.write_row_format">[文档]</a><span class="k">def</span> <span class="nf">write_row_format</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">start_pos</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="p">{},</span><span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;fit in row or col parameter to write_row method according to direction param</span>
+<span class="sd">	:param row : start row zero indexed </span>
+<span class="sd">	:param col : start col zero indexed</span>
+<span class="sd">	:param pct_format : how to display num_format</span>
+<span class="sd">	:param direction : 1/horizontal ，0/vertical</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+	<span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_column</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="n">start_pos</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">cell_format</span><span class="p">)</span>
+	<span class="k">else</span> <span class="p">:</span>
+		<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">start_pos</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">cell_format</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="write_multi_tables"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.write_multi_tables">[文档]</a><span class="k">def</span> <span class="nf">write_multi_tables</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">sheet_name</span><span class="p">,</span><span class="n">df_list</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;将多个小型数据表写入一个sheet里面</span>
+<span class="sd">	   0/horizontal 从上往下顺序写入，1/vertical 从左往右顺序写入</span>
+<span class="sd">	   有额外的kwargs参数，方便输入遇到哪个字符串就用百分比格式</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">percent_str</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;percent_str&#39;</span><span class="p">,</span><span class="s1">&#39;占比&#39;</span><span class="p">)</span>
+	<span class="n">auto_adjust_pct</span> <span class="o">=</span>  <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;auto_adjust_pct&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+	<span class="n">normal_format</span> <span class="o">=</span>  <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normal_format&#39;</span><span class="p">,{</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">})</span>
+	<span class="n">date_format</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;date_format&#39;</span><span class="p">,</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+
+	<span class="c1">#通用表头格式</span>
+	<span class="n">background_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">([</span><span class="mi">220</span><span class="p">,</span><span class="mi">230</span><span class="p">,</span><span class="mi">241</span><span class="p">])</span>
+	<span class="n">border_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">([</span><span class="mi">149</span><span class="p">,</span><span class="mi">179</span><span class="p">,</span><span class="mi">215</span><span class="p">])</span>
+
+	<span class="n">header_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;微软雅黑&#39;</span><span class="p">,</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span>
+											  <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span><span class="n">background_color</span> <span class="p">})</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_bottom</span><span class="p">()</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_bottom_color</span><span class="p">(</span><span class="n">border_color</span><span class="p">)</span>
+
+	<span class="n">normal_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">(</span><span class="n">normal_format</span><span class="p">)</span>
+
+	<span class="n">xlsxwriter_ws</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span>
+
+	<span class="c1">#记录表头</span>
+	<span class="n">horizontal_columns</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="n">vertical_columns</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+	<span class="c1">#记录每次位置</span>
+	<span class="n">position_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+	<span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df_list</span><span class="p">:</span>
+		<span class="c1">#如果其中某个或所有index不是常规的数字, reset_index</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="p">])</span> <span class="p">:</span>
+			<span class="n">df</span> <span class="o">=</span>  <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+		<span class="c1">#记录横着写的表格所有表头</span>
+		<span class="n">horizontal_columns</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">8</span><span class="p">]</span>
+		<span class="n">vertical_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+		<span class="c1">#先判断这个表格是否要按照百分比格式写入</span>
+		<span class="k">if</span> <span class="n">percent_str</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> 
+			<span class="n">pct_tag</span> <span class="o">=</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> 
+			<span class="n">pct_tag</span> <span class="o">=</span> <span class="kc">False</span> 
+
+		<span class="c1">#表头reset</span>
+		<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+		<span class="c1">#如果是以列的方式写入</span>
+		<span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">data_set</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">data_set</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+
+		<span class="n">is_header</span> <span class="o">=</span> <span class="kc">True</span>
+		<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">data</span> <span class="ow">in</span> <span class="n">data_set</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">is_header</span><span class="p">:</span>
+				<span class="c1">#写入表头</span>
+				<span class="n">header</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+				<span class="n">write_row_format</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="n">start_pos</span><span class="o">=</span><span class="n">position_counter</span><span class="p">,</span>
+								<span class="n">cell_format</span><span class="o">=</span><span class="n">header_format</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
+				<span class="n">position_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+				<span class="n">is_header</span> <span class="o">=</span> <span class="kc">False</span> 
+
+			<span class="k">else</span><span class="p">:</span>
+				<span class="c1"># 如果是日期，转成对应的日期格式</span>
+				<span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">date_format</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+				<span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+
+				<span class="k">if</span> <span class="n">pct_tag</span><span class="p">:</span>
+					<span class="c1">#百分比需要判断放入多少个小数点的百分比,不在这里加入</span>
+					<span class="n">number_format</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_format&#39;</span><span class="p">,</span><span class="s1">&#39;0.00%&#39;</span><span class="p">)</span>
+					<span class="k">if</span> <span class="n">auto_adjust_pct</span> <span class="p">:</span>  <span class="c1">#</span>
+						<span class="n">number_format</span> <span class="o">=</span> <span class="n">adjust_pct_decimal_format</span><span class="p">(</span><span class="n">number_format</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+
+					<span class="n">pct_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="n">number_format</span><span class="p">})</span>
+
+					<span class="n">write_row_format</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="n">start_pos</span><span class="o">=</span><span class="n">position_counter</span><span class="p">,</span>
+									 <span class="n">cell_format</span><span class="o">=</span><span class="n">pct_format</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">write_row_format</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="n">start_pos</span><span class="o">=</span><span class="n">position_counter</span><span class="p">,</span>
+									<span class="n">cell_format</span><span class="o">=</span><span class="n">normal_format</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
+
+				<span class="n">position_counter</span> <span class="o">+=</span> <span class="mi">1</span> 
+
+		<span class="c1">#不同表格换行</span>
+		<span class="n">position_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+		<span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">autofit_column_width</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">horizontal_columns</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">autofit_column_width</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">vertical_columns</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="df_sheet_check"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.df_sheet_check">[文档]</a><span class="k">def</span> <span class="nf">df_sheet_check</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="p">):</span>
+	<span class="c1">#防止填入的不是列表格式,防止填入的sheet_name 出现重复</span>
+	<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+		<span class="n">df_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_list</span><span class="p">]</span>
+	<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sheet_name_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+		<span class="n">sheet_name_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">sheet_name_list</span><span class="p">]</span>
+	
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sheet_name_list</span><span class="p">):</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;写入的数据表数量和填入的Sheet名称数量不相等,将使用默认Sheet名称&#39;</span><span class="p">)</span>
+
+	<span class="n">sheet_name_list</span> <span class="o">=</span> <span class="n">duplicate_elem_add_seq</span><span class="p">(</span><span class="n">sheet_name_list</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="n">sheet_name_list</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sheet_name_list</span> <span class="o">==</span> <span class="p">[</span> <span class="p">]</span> <span class="p">:</span>
+		<span class="n">sheet_name_list</span><span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_list</span><span class="p">)):</span>
+			<span class="n">sheet_name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Sheet </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+	<span class="k">return</span> <span class="n">df_list</span><span class="p">,</span> <span class="n">sheet_name_list</span></div>
+	
+<div class="viewcode-block" id="write_pct_columns"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.write_pct_columns">[文档]</a><span class="k">def</span> <span class="nf">write_pct_columns</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="n">df_list</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="o">=</span><span class="p">[],</span><span class="n">pct_columns</span><span class="o">=</span><span class="p">[],</span><span class="n">content_columns</span><span class="o">=</span><span class="p">[],</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;给定一个表格，用百分比写入包含指定文字的列,表头wrap_text, 添加选项&quot;&quot;&quot;</span>
+
+	<span class="n">xlsxwriter_wb</span> <span class="o">=</span> <span class="n">Workbook</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+
+	<span class="n">num_format</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_format&#39;</span><span class="p">,</span><span class="s1">&#39;0.00%&#39;</span><span class="p">)</span>
+	<span class="c1">#通用表头格式</span>
+	<span class="n">background_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">([</span><span class="mi">220</span><span class="p">,</span><span class="mi">230</span><span class="p">,</span><span class="mi">241</span><span class="p">])</span>
+	<span class="n">border_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">([</span><span class="mi">149</span><span class="p">,</span><span class="mi">179</span><span class="p">,</span><span class="mi">215</span><span class="p">])</span>
+	<span class="n">header_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;微软雅黑&#39;</span><span class="p">,</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span>
+											  <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span><span class="n">background_color</span> <span class="p">})</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_bottom</span><span class="p">()</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_bottom_color</span><span class="p">(</span><span class="n">border_color</span><span class="p">)</span>
+
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_text_wrap</span><span class="p">()</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_center_across</span><span class="p">()</span>
+
+	<span class="n">date_format</span> <span class="o">=</span>  <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;yyyy/mm/dd&#39;</span><span class="p">})</span>
+	<span class="n">pct_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;0.00%&#39;</span><span class="p">})</span>
+	<span class="n">text_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;@&#39;</span><span class="p">})</span>
+	<span class="n">normal_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">})</span>
+
+	<span class="n">df_list</span><span class="p">,</span> <span class="n">sheet_name_list</span> <span class="o">=</span> <span class="n">df_sheet_check</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">sheet_name_list</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">df</span><span class="p">,</span><span class="n">sheet_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="p">):</span>
+		<span class="n">xlsxwriter_ws</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span>
+
+		<span class="n">header_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+			<span class="n">pct_columns</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header_columns</span> <span class="k">if</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">pct_columns</span> <span class="k">if</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span> <span class="p">]]</span>
+			<span class="c1">#写入表头</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">header_columns</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">header_format</span><span class="p">)</span>
+
+			<span class="k">for</span> <span class="n">column_index</span><span class="p">,</span><span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header_columns</span><span class="p">):</span>
+				<span class="n">column_values</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+
+				<span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">pct_columns</span><span class="p">:</span>  <span class="c1">#如果属于百分比列 </span>
+					<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_column</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="n">column_index</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">column_values</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">pct_format</span><span class="p">)</span>
+				<span class="c1">#如果本列是日期类型,采用日期格式写入, 第二步应该到判断content_columns 还是 date? -- 以可以输入的参数为优先做判断</span>
+				<span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">)</span> <span class="p">:</span>
+					<span class="n">column_format</span> <span class="o">=</span> <span class="n">date_format</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">column_values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">column_values</span>  <span class="p">]</span>
+					<span class="n">column_format</span> <span class="o">=</span>  <span class="n">normal_format</span>
+
+				<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_column</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="n">column_index</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">column_values</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">current_format</span><span class="p">)</span>
+
+			<span class="c1">#表头加上选项</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">autofilter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">header_columns</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+			<span class="n">autofit_column_width</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">header_columns</span><span class="p">,</span><span class="n">content_columns</span><span class="o">=</span><span class="n">content_columns</span><span class="p">,</span><span class="n">wrap_text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+			<span class="c1">#冻结第一行窗口</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">freeze_panes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span> <span class="c1">#如果没有数据，默认写入表头即可</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">header_columns</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">header_format</span><span class="p">)</span>
+
+	<span class="n">save_xlsxwriter_wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">save_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="replace_invalid_strs"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.replace_invalid_strs">[文档]</a><span class="k">def</span> <span class="nf">replace_invalid_strs</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+	<span class="n">invalid_strs</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="se">\ud835</span><span class="s1">&#39;</span> <span class="p">]</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">invalid_strs</span><span class="p">:</span>
+		<span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">string</span> </div>
+
+<div class="viewcode-block" id="refresh_excel_calculations"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.refresh_excel_calculations">[文档]</a><span class="k">def</span> <span class="nf">refresh_excel_calculations</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+		<span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">file_path</span><span class="p">)</span>
+
+	<span class="n">xlapp</span> <span class="o">=</span> <span class="n">xw</span><span class="o">.</span><span class="n">App</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+	<span class="n">xlapp</span><span class="o">.</span><span class="n">display_alerts</span> <span class="o">=</span> <span class="kc">False</span>
+	<span class="n">xlwb</span> <span class="o">=</span> <span class="n">xw</span><span class="o">.</span><span class="n">Book</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+	<span class="n">xlwb</span><span class="o">.</span><span class="n">Visible</span> <span class="o">=</span> <span class="kc">False</span>
+	<span class="n">xlapp</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+	<span class="n">xlwb</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+	<span class="n">xlapp</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+
+	<span class="k">del</span> <span class="n">xlapp</span></div>
+
+<span class="c1"># def refresh_excel_calculations(file_path):</span>
+<span class="c1"># 	file_path = os.path.join(os.getcwd(), file_path )</span>
+<span class="c1"># 	#检查输出文件夹 是否存在</span>
+<span class="c1"># 	if not os.path.isfile(file_path):</span>
+<span class="c1"># 		enter_exit(&quot;File not found: &quot;,file_path)</span>
+
+<span class="c1"># 	#打开文档，运行VBA, 如果有报错，everything 搜索gen_py文件 删除，让系统重新生成新的gen_py</span>
+<span class="c1"># 	xlapp = client.gencache.EnsureDispatch(&#39;Excel.Application&#39;)   </span>
+<span class="c1"># 	xlapp.Visible = 0  </span>
+<span class="c1"># 	xlapp.DisplayAlerts = False </span>
+<span class="c1"># 	xlwb = xlapp.Workbooks.Open(file_path) </span>
+<span class="c1"># 	xlwb.Visible = 0</span>
+<span class="c1"># 	xlapp.Calculate()</span>
+<span class="c1"># 	xlwb.Close(True)</span>
+<span class="c1"># 	xlapp.Quit</span>
+
+<div class="viewcode-block" id="write_format_columns"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.write_format_columns">[文档]</a><span class="k">def</span> <span class="nf">write_format_columns</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="n">df_list</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="o">=</span><span class="p">[],</span><span class="n">pct_columns</span><span class="o">=</span><span class="p">[],</span><span class="n">round_columns</span><span class="o">=</span><span class="p">[],</span><span class="n">content_columns</span><span class="o">=</span><span class="p">[],</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;给定一个表格，用百分比写入包含指定文字的列,表头wrap_text, 添加选项,上面write_pct_columns方式不写是不希望每列str都变成text格式，</span>
+<span class="sd">	   正常应该是常规格式</span>
+<span class="sd">	   基本和前面的write_pct_columns相同，区别在于加上了整列如果都是str用text格式写入的方式&quot;&quot;&quot;</span>
+	<span class="n">xlsxwriter_wb</span> <span class="o">=</span> <span class="n">Workbook</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+
+	<span class="n">min_column_width</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;min_column_width&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+	<span class="n">round_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;round_list&#39;</span><span class="p">,[</span> <span class="s1">&#39;标准差&#39;</span><span class="p">,</span><span class="s1">&#39;平均&#39;</span><span class="p">,</span><span class="s1">&#39;方差&#39;</span><span class="p">])</span>
+	<span class="n">pct_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pct_list&#39;</span><span class="p">,[</span><span class="s1">&#39;rate&#39;</span><span class="p">,</span><span class="s1">&#39;百分比&#39;</span><span class="p">,</span><span class="s1">&#39;占比&#39;</span><span class="p">,</span><span class="s1">&#39;比例&#39;</span><span class="p">,</span><span class="s1">&#39;比率&#39;</span><span class="p">])</span>
+
+	<span class="c1">#通用表头格式</span>
+	<span class="n">background_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">([</span><span class="mi">220</span><span class="p">,</span><span class="mi">230</span><span class="p">,</span><span class="mi">241</span><span class="p">])</span>
+	<span class="n">border_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">([</span><span class="mi">149</span><span class="p">,</span><span class="mi">179</span><span class="p">,</span><span class="mi">215</span><span class="p">])</span>
+	<span class="n">header_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;微软雅黑&#39;</span><span class="p">,</span><span class="s1">&#39;bold&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span>
+											  <span class="s1">&#39;bg_color&#39;</span><span class="p">:</span><span class="n">background_color</span> <span class="p">})</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_bottom</span><span class="p">()</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_bottom_color</span><span class="p">(</span><span class="n">border_color</span><span class="p">)</span>
+
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_text_wrap</span><span class="p">()</span>
+	<span class="n">header_format</span><span class="o">.</span><span class="n">set_center_across</span><span class="p">()</span>
+
+	<span class="n">date_format</span> <span class="o">=</span>  <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;yyyy/mm/dd&#39;</span><span class="p">})</span>
+	<span class="n">pct_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;0.00%&#39;</span><span class="p">})</span>
+	<span class="n">text_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;@&#39;</span><span class="p">})</span>
+	<span class="n">normal_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">})</span>
+	<span class="n">round_format</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_format</span><span class="p">({</span><span class="s1">&#39;font_name&#39;</span><span class="p">:</span><span class="s1">&#39;calibri&#39;</span><span class="p">,</span><span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="s1">&#39;num_format&#39;</span><span class="p">:</span><span class="s1">&#39;0.00&#39;</span><span class="p">})</span>
+	
+	<span class="n">df_list</span><span class="p">,</span> <span class="n">sheet_name_list</span> <span class="o">=</span> <span class="n">df_sheet_check</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">sheet_name_list</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">df</span><span class="p">,</span><span class="n">sheet_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="p">):</span>
+		<span class="n">xlsxwriter_ws</span> <span class="o">=</span> <span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span>
+
+		<span class="c1">#是否属于MultiIndex,如果是，需要确保写入完整--暂时不添加该功能</span>
+		<span class="c1"># if isinstance(df.column, MultiIndex):</span>
+
+		<span class="n">header_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+			<span class="n">pct_columns</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header_columns</span> <span class="k">if</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">pct_columns</span> <span class="k">if</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span> <span class="p">]]</span>
+			<span class="c1">#写入表头</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">header_columns</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">header_format</span><span class="p">)</span>
+
+			<span class="k">for</span> <span class="n">column_index</span><span class="p">,</span><span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">header_columns</span><span class="p">):</span>
+				<span class="n">column_values</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+				<span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">pct_columns</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">([</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pct_list</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">column</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1">#如果属于百分比列 </span>
+					<span class="n">column_format</span> <span class="o">=</span> <span class="n">pct_format</span>
+				<span class="k">elif</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">round_columns</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">([</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">round_list</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">column</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="p">:</span> <span class="c1">#如果属于需要round的列</span>
+					<span class="n">column_format</span> <span class="o">=</span> <span class="n">round_format</span>
+				<span class="c1">#判断是否整列都属于str格式，采用text格式写入</span>
+				<span class="k">elif</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+					<span class="n">column_format</span> <span class="o">=</span> <span class="n">text_format</span>
+				<span class="c1">#如果本列是日期类型,采用日期格式写入, 第二步应该到判断content_columns 还是 date? -- 以可以输入的参数为优先做判断</span>
+				<span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">)</span>  <span class="p">:</span>
+					<span class="n">column_values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">column_values</span><span class="p">]</span>
+					<span class="n">column_format</span> <span class="o">=</span> <span class="n">date_format</span>
+				<span class="c1">#是否整列都是float格式</span>
+				<span class="c1"># elif df[column].apply(type).eq(float).all():</span>
+				<span class="c1"># 	column_format = round_format</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">column_values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">column_values</span>  <span class="p">]</span>
+					<span class="n">column_values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">column_values</span><span class="p">]</span>
+					<span class="n">column_format</span> <span class="o">=</span>  <span class="n">normal_format</span>
+
+				<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_column</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="n">column_index</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">column_values</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">column_format</span><span class="p">)</span>
+
+			<span class="c1">#表头加上选项</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">autofilter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">header_columns</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+			<span class="n">autofit_column_width</span><span class="p">(</span><span class="n">xlsxwriter_ws</span><span class="p">,</span><span class="n">header_columns</span><span class="p">,</span><span class="n">content_columns</span><span class="o">=</span><span class="n">content_columns</span><span class="p">,</span>
+											<span class="n">wrap_text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_column_width</span><span class="o">=</span><span class="n">min_column_width</span><span class="p">)</span>
+
+			<span class="c1">#冻结第一行窗口</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">freeze_panes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span> <span class="c1">#如果没有数据，默认写入表头即可</span>
+			<span class="n">xlsxwriter_ws</span><span class="o">.</span><span class="n">write_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">header_columns</span><span class="p">,</span><span class="n">cell_format</span><span class="o">=</span><span class="n">header_format</span><span class="p">)</span>
+
+	<span class="n">save_xlsxwriter_wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">save_path</span><span class="p">)</span></div>
+
+<span class="sd">&quot;&quot;&quot;以下部分主要是openpyxl的方法&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="rgb_convert_hex"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.rgb_convert_hex">[文档]</a><span class="k">def</span> <span class="nf">rgb_convert_hex</span><span class="p">(</span><span class="n">rgb_list</span><span class="p">):</span>
+	<span class="c1">#防止填入了超过255或者小于0的数值</span>
+	<span class="n">rgb_list</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="mi">255</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rgb_list</span><span class="p">]</span>
+	<span class="n">hex_value</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0:02x}{1:02x}{2:02x}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rgb_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">rgb_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">rgb_list</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">hex_value</span></div>
+
+
+<div class="viewcode-block" id="get_column_row_num"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.get_column_row_num">[文档]</a><span class="k">def</span> <span class="nf">get_column_row_num</span><span class="p">(</span><span class="n">worksheet</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	calculate the number of columns and rows from a worksheet </span>
+<span class="sd">	:param worksheet: openpyxl worksheet</span>
+<span class="sd">	:return : column_letters, row_numbers </span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="c1">#计算一共有多少列</span>
+	<span class="n">column_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">worksheet</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">]))</span>
+	<span class="n">column_letters</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_column_letter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">column_num</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+	<span class="c1">#计算一共有多少行</span>
+	<span class="n">row_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">worksheet</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]))</span>
+	<span class="n">row_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">row_num</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+
+	<span class="k">return</span> <span class="n">column_letters</span><span class="p">,</span><span class="n">row_numbers</span></div>
+
+<div class="viewcode-block" id="format_custom_cells"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.format_custom_cells">[文档]</a><span class="k">def</span> <span class="nf">format_custom_cells</span><span class="p">(</span><span class="n">worksheet</span><span class="p">,</span><span class="n">custom_cells_dict</span><span class="p">,</span><span class="n">custom_cell_color</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	处理特殊的单元格</span>
+<span class="sd">	:param custom_cells_dict :默认key代表要修改的sheet_name,value是list类型，第一个元素是列，第二个元素的行</span>
+<span class="sd">	:custom_cell_color: 指定单元格的字体颜色</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">custom_cell_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">(</span><span class="n">custom_cell_color</span><span class="p">)</span>
+	<span class="n">custom_font</span> <span class="o">=</span> <span class="n">Font</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">custom_cell_color</span><span class="p">)</span>
+
+	<span class="c1">#需要调整的sheet_name</span>
+	<span class="c1">#检查传入的sheet是否是需要修改的匹配的sheet_name</span>
+	<span class="k">for</span> <span class="n">c_key</span> <span class="ow">in</span> <span class="n">custom_cells_dict</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">c_key</span> <span class="o">==</span> <span class="n">worksheet</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+			<span class="c1">#如果是这个需要修改的sheet </span>
+			<span class="c1">#第一个元素为列，第二个元素代表行</span>
+			<span class="n">c_column_list</span> <span class="o">=</span> <span class="n">custom_cells_dict</span><span class="p">[</span><span class="n">c_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+			<span class="n">c_row_list</span> <span class="o">=</span> <span class="n">custom_cells_dict</span><span class="p">[</span><span class="n">c_key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+			<span class="c1">#防止填入的数字有0</span>
+			<span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">c_column_list</span><span class="p">:</span>
+				<span class="n">c_column_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">c_column_list</span><span class="p">]</span>		
+			<span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">c_row_list</span><span class="p">:</span>
+				<span class="n">c_row_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">c_row_list</span><span class="p">]</span>
+
+			<span class="c1">#循环修改格式</span>
+			<span class="k">for</span> <span class="n">c_column</span> <span class="ow">in</span> <span class="n">c_column_list</span><span class="p">:</span>
+				<span class="n">c_column_letter</span> <span class="o">=</span> <span class="n">get_column_letter</span><span class="p">(</span><span class="n">c_column</span><span class="p">)</span>
+				<span class="k">for</span> <span class="n">c_row</span> <span class="ow">in</span> <span class="n">c_row_list</span><span class="p">:</span>
+					<span class="n">c_target</span> <span class="o">=</span> <span class="n">c_column_letter</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c_row</span><span class="p">)</span>
+					<span class="n">worksheet</span><span class="p">[</span><span class="n">c_target</span><span class="p">]</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="n">custom_font</span></div>
+
+<div class="viewcode-block" id="format_table"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.format_table">[文档]</a><span class="k">def</span> <span class="nf">format_table</span><span class="p">(</span><span class="n">worksheet</span><span class="p">,</span><span class="n">format_style</span><span class="p">,</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	传入worksheet进行统一格式调整后返回worksheet对象</span>
+<span class="sd">	:param worksheet :openpyxl worksheet </span>
+<span class="sd">	:param format_style : 1/text or 2/data ,default is None</span>
+<span class="sd">	:param wrap_text : the column letter you want to have auto line break, default is None</span>
+<span class="sd">	:header_color : rgb value in list format, None is transparent, &#39;default&#39; is light blue</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="n">kwargs</span> <span class="o">==</span> <span class="p">{}:</span>
+		<span class="n">kwargs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">()</span>
+
+	<span class="c1">#表头颜色，最后一行字体是否加粗</span>
+	<span class="n">header_color</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;header_color&#39;</span><span class="p">,</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+	<span class="n">last_row_bold</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;last_row_bold&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+	<span class="c1">#第一行第一列的高度和宽度</span>
+	<span class="n">first_row_height</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;first_row_height&#39;</span><span class="p">,</span><span class="mi">27</span><span class="p">)</span>
+	<span class="n">first_column_width</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;first_column_width&#39;</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+	<span class="c1">#主体部分宽和高</span>
+	<span class="n">main_part_width</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;main_part_width&#39;</span><span class="p">,</span><span class="mi">14</span><span class="p">)</span>
+	<span class="n">main_part_height</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;main_part_height&#39;</span><span class="p">,</span><span class="mi">14</span><span class="p">)</span>
+	<span class="c1">#定制单元格</span>
+	<span class="n">custom_cells_dict</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;custom_cells_dict&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+	<span class="n">custom_cell_color</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;custom_cell_color&#39;</span><span class="p">,[</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="c1">#red </span>
+
+	<span class="n">column_letters</span><span class="p">,</span><span class="n">row_numbers</span> <span class="o">=</span> <span class="n">get_column_row_num</span><span class="p">(</span><span class="n">worksheet</span><span class="p">)</span>
+
+	<span class="c1"># =========== 通用的格式部分 ==========</span>
+	<span class="c1">#第一行设置格式 _ 自动换行 _ 居中,是否旋转文字 等条件 </span>
+	<span class="n">row_1_alignment</span> <span class="o">=</span> <span class="n">Alignment</span><span class="p">(</span>    <span class="n">horizontal</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
+									<span class="n">vertical</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
+									<span class="n">text_rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+									<span class="n">wrap_text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+									<span class="n">shrink_to_fit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+									<span class="n">indent</span><span class="o">=</span><span class="mi">0</span>  <span class="p">)</span>
+	<span class="c1">#字体加粗</span>
+	<span class="n">row_1_font</span> <span class="o">=</span> <span class="n">Font</span><span class="p">(</span><span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+	<span class="c1">#循环第一行格式</span>
+	<span class="k">for</span> <span class="n">cell_1</span> <span class="ow">in</span> <span class="n">worksheet</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">]:</span>
+		<span class="n">cell_1</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">row_1_alignment</span>
+		<span class="n">cell_1</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="n">row_1_font</span>
+
+	<span class="c1">#表头颜色</span>
+	<span class="n">default_header_color</span> <span class="o">=</span> <span class="p">[</span><span class="mi">189</span><span class="p">,</span><span class="mi">215</span><span class="p">,</span><span class="mi">238</span><span class="p">]</span>  <span class="c1">#浅蓝色</span>
+	
+	<span class="k">if</span> <span class="n">header_color</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+		<span class="n">header_color</span> <span class="o">=</span> <span class="n">default_header_color</span>
+
+	<span class="k">if</span> <span class="n">header_color</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="c1">#把rgb的颜色格式转成aRGB hex value </span>
+		<span class="n">header_color</span> <span class="o">=</span> <span class="n">rgb_convert_hex</span><span class="p">(</span><span class="n">header_color</span><span class="p">)</span>
+		<span class="c1">#循环第一行背景颜色填充</span>
+		<span class="n">row_1_colorFill</span> <span class="o">=</span> <span class="n">PatternFill</span><span class="p">(</span><span class="n">start_color</span> <span class="o">=</span> <span class="n">header_color</span><span class="p">,</span>
+										<span class="n">end_color</span> <span class="o">=</span> <span class="n">header_color</span><span class="p">,</span>
+										<span class="n">fill_type</span> <span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">cell_1</span> <span class="ow">in</span> <span class="n">worksheet</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">]:</span>
+			<span class="n">cell_1</span><span class="o">.</span><span class="n">fill</span> <span class="o">=</span> <span class="n">row_1_colorFill</span>
+
+	<span class="c1">#默认全部全部表格居左</span>
+	<span class="n">cell_alignment</span> <span class="o">=</span> <span class="n">Alignment</span><span class="p">(</span><span class="n">horizontal</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span><span class="n">vertical</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">worksheet</span><span class="o">.</span><span class="n">rows</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]:</span>
+		<span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+			<span class="n">cell</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">cell_alignment</span>
+
+	<span class="c1">#循环调整行宽（默认行宽太窄）,以下代码容易出现错误 且不会提示哪里错，行对应是高，列对应是输入宽度</span>
+	<span class="c1">#wrap_text很容易受别的alignment影响，在text格式下也不再进行调整</span>
+	<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row_numbers</span><span class="p">:</span>
+		<span class="n">worksheet</span><span class="o">.</span><span class="n">row_dimensions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">main_part_height</span>
+	<span class="c1">#调整行高</span>
+	<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_letters</span><span class="p">:</span>
+		<span class="n">worksheet</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">main_part_width</span>
+
+	<span class="c1">#是否包含需要特殊格式的单元格</span>
+	<span class="k">if</span> <span class="n">custom_cells_dict</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="n">format_custom_cells</span><span class="p">(</span><span class="n">worksheet</span><span class="p">,</span><span class="n">custom_cells_dict</span><span class="p">,</span><span class="n">custom_cell_color</span><span class="p">)</span>
+
+	<span class="c1"># ========  1 TEXT .普通文字型表格 : 最后一列调整成特别的宽度============</span>
+	<span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">format_style</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;text&#39;</span> <span class="ow">or</span> <span class="n">format_style</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="n">worksheet</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="n">column_letters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">80</span>
+
+		<span class="c1">#wrap_text会被固定的行高限定住，如果想auto linebreak还是需要计算单元格里面的字体内容，通过内容和宽度得到应该调整的行高，</span>
+		<span class="c1">#当前虽然没办法自动换行，但是还是需要添加这个条件，否则打开excel选择自动换行也不生效，还要选个行高自动调整</span>
+		<span class="n">wrap_text_alignment</span> <span class="o">=</span> <span class="n">Alignment</span><span class="p">(</span><span class="n">wrap_text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">worksheet</span><span class="p">[</span><span class="n">column_letters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])[</span><span class="mi">1</span><span class="p">:]:</span>
+			<span class="n">cell</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">wrap_text_alignment</span>
+
+	<span class="c1"># ============= 2 DATA 数据型表格 ==============</span>
+	<span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">format_style</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span> <span class="ow">or</span> <span class="n">format_style</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+		<span class="c1">#第一行加高和第一列加宽</span>
+		<span class="n">worksheet</span><span class="o">.</span><span class="n">row_dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">first_row_height</span>
+		<span class="n">worksheet</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">first_column_width</span>
+
+		<span class="c1">#循环第一列居左</span>
+		<span class="k">for</span> <span class="n">cell_A</span> <span class="ow">in</span> <span class="n">worksheet</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]:</span>
+			<span class="n">cell_A</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">Alignment</span><span class="p">(</span><span class="n">horizontal</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+		<span class="c1">#循环调整其他部分的全部列宽</span>
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_letters</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+			<span class="n">worksheet</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">main_part_width</span>
+		<span class="c1">#循环调整其他部分的全部行高</span>
+		<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row_numbers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+			<span class="n">worksheet</span><span class="o">.</span><span class="n">row_dimensions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">main_part_height</span>
+
+		<span class="c1">#循环数字部分主体靠右展示</span>
+		<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">worksheet</span><span class="o">.</span><span class="n">rows</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]:</span>
+			<span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]:</span>
+				<span class="n">cell</span><span class="o">.</span><span class="n">alignment</span> <span class="o">=</span> <span class="n">Alignment</span><span class="p">(</span><span class="n">horizontal</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+		<span class="c1">#最后一行是否要加粗</span>
+		<span class="k">if</span> <span class="n">last_row_bold</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">worksheet</span><span class="o">.</span><span class="n">rows</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+				<span class="n">cell</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="n">Font</span><span class="p">(</span><span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+				<span class="n">cell</span><span class="o">.</span><span class="n">border</span> <span class="o">=</span> <span class="n">Border</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="n">Side</span><span class="p">(</span><span class="n">border_style</span><span class="o">=</span><span class="s2">&quot;thin&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;000000&quot;</span><span class="p">))</span>
+
+	<span class="k">return</span> <span class="n">worksheet</span> </div>
+
+
+<div class="viewcode-block" id="save_xlsxwriter_wb"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.save_xlsxwriter_wb">[文档]</a><span class="k">def</span> <span class="nf">save_xlsxwriter_wb</span><span class="p">(</span><span class="n">xlsxwriter_wb</span><span class="p">,</span><span class="n">save_path</span><span class="p">):</span>
+	<span class="c1">#检查是否存在save_path路径</span>
+	<span class="n">check_create_new_folder</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+	<span class="n">close_tag</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">while</span> <span class="n">close_tag</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">xlsxwriter_wb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+			<span class="n">close_tag</span> <span class="o">+=</span> <span class="mi">1</span> 
+		<span class="k">except</span> <span class="n">FileCreateError</span><span class="p">:</span>
+			<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Failed to write file!</span><span class="se">\n</span><span class="s1">  Please Close &quot;</span><span class="si">{}</span><span class="s1">&quot; Then Press Enter to Continue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span>
+	<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> Saved&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="save_csv"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.save_csv">[文档]</a><span class="k">def</span> <span class="nf">save_csv</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">save_path</span><span class="p">):</span>
+	<span class="n">check_create_new_folder</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+	<span class="n">close_tag</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">while</span> <span class="n">close_tag</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+			<span class="n">close_tag</span> <span class="o">+=</span> <span class="mi">1</span> 
+		<span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+			<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Failed to write file!</span><span class="se">\n</span><span class="s1">  Please Close &quot;</span><span class="si">{}</span><span class="s1">&quot; Then Press Enter to Continue&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span>
+	<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> Saved&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="save_excel"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.excel_functions.save_excel">[文档]</a><span class="k">def</span> <span class="nf">save_excel</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span><span class="n">save_path</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">format_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	通过openpyxl写入pandas表格，可以修改写入格式</span>
+<span class="sd">	:param df_list : df list need to write </span>
+<span class="sd">	:param save_path : target path</span>
+<span class="sd">	:param sheet_name_list : sheet_names coresponding to df_list</span>
+<span class="sd">	:param format_style : default is None, bolded header;  text or 1  (change header format </span>
+<span class="sd">	 and column width only); &#39;data&#39; or 2 adjust the header and the first column</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">wb</span> <span class="o">=</span> <span class="n">openpyxl_workbook</span><span class="p">()</span>
+
+	<span class="c1">#防止填入的不是列表格式</span>
+	<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+		<span class="n">df_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_list</span><span class="p">]</span>
+	<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sheet_name_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+		<span class="n">sheet_name_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">sheet_name_list</span><span class="p">]</span>
+	
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sheet_name_list</span><span class="p">):</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;写入的数据表数量和填入的Sheet名称数量不相等,将使用默认Sheet名称&#39;</span><span class="p">)</span>
+		
+	<span class="k">if</span> <span class="n">sheet_name_list</span> <span class="o">==</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="p">:</span>
+		<span class="n">sheet_name_list</span><span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_list</span><span class="p">)):</span>
+			<span class="n">sheet_name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Sheet </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+	
+	<span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span><span class="n">sheet_name_list</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+			<span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">)</span>
+			<span class="c1">#写入表头</span>
+			<span class="n">column_list</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+			<span class="n">ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column_list</span><span class="p">)</span>
+			<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span> 
+			<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+				<span class="n">value</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>  <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span> <span class="p">]</span>
+				<span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span> 
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">ws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+				<span class="k">except</span><span class="p">:</span>
+					<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;本行数据出错：</span><span class="si">{</span><span class="n">sheet_name</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">counter</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+					<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+			<span class="n">ws</span> <span class="o">=</span> <span class="n">format_table</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span><span class="n">format_style</span><span class="o">=</span><span class="n">format_style</span><span class="p">,</span><span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="c1">#删除默认的sheet</span>
+	<span class="k">del</span> <span class="n">wb</span><span class="p">[</span><span class="s1">&#39;Sheet&#39;</span><span class="p">]</span>
+
+	<span class="c1">#保存全部文档</span>
+	<span class="n">check_close</span> <span class="o">=</span> <span class="mi">0</span>  
+	<span class="k">while</span> <span class="n">check_close</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">wb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+			<span class="n">check_close</span> <span class="o">+=</span> <span class="mi">1</span> 
+		<span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+			<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;无法正常记录，请关闭</span><span class="si">{}</span><span class="s1">后摁回车键继续&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span>
+
+	<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> 已保存&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

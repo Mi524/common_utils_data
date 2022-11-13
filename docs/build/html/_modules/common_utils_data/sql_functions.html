@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common_utils_data.sql_functions &mdash; common_utils_data v0.9.1 文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> common_utils_data
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">common_utils_data</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">模块代码</a></li>
+      <li class="breadcrumb-item active">common_utils_data.sql_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>common_utils_data.sql_functions 源代码</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.os_functions</span> <span class="kn">import</span> <span class="n">enter_exit</span> 
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.pool</span> <span class="kn">import</span> <span class="n">NullPool</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="kn">import</span> <span class="n">text</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">cx_Oracle</span> 
+
+<span class="c1"># 批量扫描需要增加的表是否都有数据且数据正常更新</span>
+
+<div class="viewcode-block" id="get_connection_by_config"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.get_connection_by_config">[文档]</a><span class="k">def</span> <span class="nf">get_connection_by_config</span><span class="p">(</span><span class="n">database_type</span><span class="o">=</span><span class="s1">&#39;mysql&#39;</span><span class="p">,</span><span class="n">config_path</span><span class="o">=</span> <span class="s1">&#39;connection_config.ini&#39;</span><span class="p">):</span>
+    <span class="n">cfparser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">cfparser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;connection_config.ini&#39;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">config_sections</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;读取到的Sections:&#39;</span><span class="p">,</span><span class="n">config_sections</span><span class="p">)</span>
+
+    <span class="n">host</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;host&#39;</span><span class="p">)</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;port&#39;</span><span class="p">)</span>
+    <span class="n">database</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;database&#39;</span><span class="p">)</span>
+    <span class="n">charset</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;charset&#39;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;username&#39;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">database_type</span> <span class="o">==</span> <span class="s1">&#39;mssql&#39;</span><span class="p">:</span>
+        <span class="n">database_type</span> <span class="o">+=</span> <span class="s1">&#39;+pymssql&#39;</span>
+
+    <span class="n">engine_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">database_type</span><span class="si">}</span><span class="s1">://</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s1">@</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">database</span><span class="si">}</span><span class="s1">?charset=</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">conn</span><span class="p">,</span> <span class="n">db</span> <span class="o">=</span> <span class="n">get_sql_connection</span><span class="p">(</span><span class="n">engine_text</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db</span></div>
+
+<div class="viewcode-block" id="gen_engine_text"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.gen_engine_text">[文档]</a><span class="k">def</span> <span class="nf">gen_engine_text</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">database_type</span><span class="p">):</span>
+    <span class="c1">#读取ini配置</span>
+    <span class="n">cfparser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">cfparser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">config_sections</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
+
+    <span class="n">host</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;host&#39;</span><span class="p">)</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;port&#39;</span><span class="p">)</span>
+    <span class="n">database</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;database&#39;</span><span class="p">)</span>
+    <span class="n">charset</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;charset&#39;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;username&#39;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+
+    <span class="n">engine_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">database_type</span><span class="si">}</span><span class="s1">://</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s1">@</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">database</span><span class="si">}</span><span class="s1">?charset=</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;oracle&#39;</span> <span class="ow">in</span> <span class="n">database_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="c1">#Oracle需要指定client位置</span>
+        <span class="n">lib_dir</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;oci_folder_path&#39;</span><span class="p">)</span>
+        <span class="n">cx_Oracle</span><span class="o">.</span><span class="n">init_oracle_client</span><span class="p">(</span><span class="n">lib_dir</span><span class="o">=</span><span class="n">lib_dir</span><span class="p">)</span>
+
+        <span class="n">database</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;database&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">service_name</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;service_name&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">service_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="n">cfparser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database_type</span><span class="p">,</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="c1"># engine = create_engine(&quot;oracle+cx_oracle://&lt;username&gt;:&lt;password&gt;@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = &lt;host&gt;)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = devdb)))&quot;) </span>
+
+    <span class="k">if</span> <span class="s1">&#39;oracle&#39;</span> <span class="ow">in</span> <span class="n">database_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">and</span> <span class="n">service_name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">engine_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">database_type</span><span class="si">}</span><span class="s1">://</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s1">@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = </span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s1">)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (schema=</span><span class="si">{</span><span class="n">database</span><span class="si">}</span><span class="s1">) (SERVICE_NAME = </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s1">) (CHARSET=utf8)))&#39;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;oracle&#39;</span> <span class="ow">in</span> <span class="n">database_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">and</span> <span class="n">sid</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">engine_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">database_type</span><span class="si">}</span><span class="s1">://</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s1">@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = </span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s1">)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (schema=</span><span class="si">{</span><span class="n">database</span><span class="si">}</span><span class="s1">)(SID = </span><span class="si">{</span><span class="n">sid</span><span class="si">}</span><span class="s1">) (CHARSET=utf8)))&#39;</span>
+
+    <span class="k">return</span> <span class="n">engine_text</span></div>
+
+
+<div class="viewcode-block" id="get_sql_connection"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.get_sql_connection">[文档]</a><span class="k">def</span> <span class="nf">get_sql_connection</span><span class="p">(</span><span class="n">engine_text</span><span class="p">):</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">poolclass</span><span class="o">=</span> <span class="n">NullPool</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db</span></div>
+
+<div class="viewcode-block" id="close_sql_connection"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.close_sql_connection">[文档]</a><span class="k">def</span> <span class="nf">close_sql_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="execute_fetchall"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.execute_fetchall">[文档]</a><span class="k">def</span> <span class="nf">execute_fetchall</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">sql</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sql</span> <span class="o">=</span>  <span class="n">text</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;没有找到任何对应数据或者未知异常</span><span class="se">\n</span><span class="s1"> SQL:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span> </div>
+        
+<div class="viewcode-block" id="convert_fetchall2df"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.convert_fetchall2df">[文档]</a><span class="k">def</span> <span class="nf">convert_fetchall2df</span><span class="p">(</span><span class="n">fetchall_result</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fetchall_result</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fetchall_result</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="n">fetchall_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;没有转换成功DF数据或未知异常&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span> </div>
+
+
+<div class="viewcode-block" id="execute_fetchall_engine"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.execute_fetchall_engine">[文档]</a><span class="k">def</span> <span class="nf">execute_fetchall_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">sql</span><span class="p">):</span>
+    <span class="c1"># print(engine_text)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">poolclass</span><span class="o">=</span> <span class="n">NullPool</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span> 
+    <span class="n">sql</span> <span class="o">=</span>  <span class="n">text</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fetchall_result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">fetchall_result</span> <span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Results get:</span><span class="si">{}</span><span class="s1"> rows&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fetchall_result</span><span class="p">)))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fetchall_result</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="n">fetchall_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Results set is empty&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No data was found or unknow error happened</span><span class="se">\n</span><span class="s1">:&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">result</span> </div>
+
+<div class="viewcode-block" id="execute_updates_engine"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.execute_updates_engine">[文档]</a><span class="k">def</span> <span class="nf">execute_updates_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">sql</span><span class="p">):</span>
+    <span class="c1">#通过engine_text直接执行语句</span>
+    <span class="n">conn</span><span class="p">,</span> <span class="n">db</span> <span class="o">=</span> <span class="n">get_sql_connection</span><span class="p">(</span><span class="n">engine_text</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot; set sql_safe_updates = 0; &quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">执行失败&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">close_sql_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">db</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_sql_result"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.get_sql_result">[文档]</a><span class="k">def</span> <span class="nf">get_sql_result</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">sql</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">execute_fetchall</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">convert_fetchall2df</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result_df</span> </div>
+
+<div class="viewcode-block" id="get_alter_index_text"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.get_alter_index_text">[文档]</a><span class="k">def</span> <span class="nf">get_alter_index_text</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">table_name</span><span class="p">):</span>
+    <span class="c1">#获取到增加或删除表索引的可执行TEXT文本, 废弃的function,mysql load方法不用去掉索引写入也非常快</span>
+    <span class="n">show_index_sql</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                      SELECT table_name AS `Table`,</span>
+<span class="s2">                           index_name AS `Index`,</span>
+<span class="s2">                           GROUP_CONCAT(column_name ORDER BY index_name,seq_in_index  ) AS `Columns`</span>
+<span class="s2">                        FROM information_schema.statistics</span>
+<span class="s2">                        WHERE table_schema = database()</span>
+<span class="s2">                        and table_name  = &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span>
+<span class="s2">                        GROUP BY table_name, index_name</span>
+<span class="s2">                        order by max(seq_in_index), length(GROUP_CONCAT(column_name ORDER BY index_name,seq_in_index )) </span>
+<span class="s2">                    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">))</span> 
+    <span class="c1">#将获取的索引结果组合，清除掉索引 </span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">show_index_sql</span><span class="p">)</span>
+    <span class="n">table_indexes</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+    <span class="n">add_index_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+    <span class="n">del_index_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">table_indexes</span><span class="p">:</span>
+        <span class="n">index_name</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">column_name</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">index_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;PRIMARY&#39;</span><span class="p">:</span>
+            <span class="n">add_index_text</span> <span class="o">=</span> <span class="s1">&#39;add index &#39;</span> <span class="o">+</span> <span class="n">index_name</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">column_name</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">del_index_text</span> <span class="o">=</span> <span class="s1">&#39;drop index &#39;</span> <span class="o">+</span> <span class="n">index_name</span>  <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+            <span class="n">add_index_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_index_text</span><span class="p">)</span>
+            <span class="n">del_index_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">del_index_text</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">add_index_list</span><span class="p">:</span>
+        <span class="n">add_index_text</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s1">&#39;alter table </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">add_index_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">execution_options</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">del_index_text</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s1">&#39;alter table </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">del_index_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">execution_options</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">add_index_text</span><span class="p">,</span><span class="n">del_index_text</span> </div>
+
+<div class="viewcode-block" id="write2table"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.write2table">[文档]</a><span class="k">def</span> <span class="nf">write2table</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">df</span><span class="p">,</span><span class="n">table_name</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span><span class="p">):</span>
+    <span class="c1"># engine_text format : &quot;mysql://root:00000000@localhost:3306/web_data?charset=utf8&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    4种方式写入: 1.normal: 直接写入，可选参数是否清空原有表；</span>
+<span class="sd">                2.complete_rewrite: 删除原有的所有数据，并整个写入新数据</span>
+<span class="sd">                3.mysql_load：直接通过mysql_load 方式写入 (这个方式经测试已经非常快，不用再重建索引也很快)</span>
+<span class="sd">               （适用于特别大的数据集, 都需要确保MYSQL已经有完整的表结构）</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">poolclass</span><span class="o">=</span><span class="n">NullPool</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+    <span class="c1">#schema是发现oracle无法写入数据加上的</span>
+    <span class="k">if</span> <span class="n">how</span> <span class="o">==</span> <span class="s1">&#39;normal&#39;</span> <span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span><span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span><span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">chunksize</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">how</span> <span class="o">==</span> <span class="s1">&#39;complete_rewrite&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">truncate_statement</span> <span class="o">=</span> <span class="s2">&quot;truncate </span><span class="si">{}</span><span class="s2">;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">truncate_statement</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;truncate table&quot;</span><span class="si">{}</span><span class="s1">&quot; failed!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">))</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span><span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span><span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">chunksize</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+    <span class="c1">#如果采用第二种方式写入</span>
+    <span class="k">elif</span> <span class="n">how</span> <span class="o">==</span> <span class="s1">&#39;mysql_load&#39;</span> <span class="p">:</span> 
+        <span class="c1">#如果存在自增主键,去掉表头的自增主键</span>
+        <span class="n">auto_increment_key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">header_column_sql</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot; describe </span><span class="si">{}</span><span class="s2"> ;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">header_column_sql</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">header_columns</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">enter_exit</span><span class="p">(</span><span class="s1">&#39;找不到表格:&#39;</span><span class="p">,</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="c1">#根据MYSQL表头结构构建一个能LOAD的CSV文档,如果表格存在自增主键，</span>
+        <span class="n">auto_increment_key_sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot; SELECT COLUMN_NAME</span>
+<span class="s2">                                     FROM INFORMATION_SCHEMA.COLUMNS  </span>
+<span class="s2">                                     WHERE TABLE_SCHEMA = DATABASE()  AND TABLE_NAME = &#39;</span><span class="si">{}</span><span class="s2">&#39;  AND DATA_TYPE = &#39;int&#39;</span>
+<span class="s2">                                     AND COLUMN_DEFAULT IS NULL AND IS_NULLABLE = &#39;NO&#39; AND EXTRA like &#39;</span><span class="si">%a</span><span class="s2">uto_increment%&#39;;</span>
+<span class="s2">                                 &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+
+        <span class="n">auto_increment_key_sql</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">auto_increment_key_sql</span><span class="p">)</span>
+        <span class="n">result_auto</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">auto_increment_key_sql</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">result_auto</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">auto_increment_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">result_auto</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">header_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header_columns</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">auto_increment_key</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header_columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">h</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">header_columns</span><span class="p">]</span>
+        <span class="c1">#保存数据到临时目的地</span>
+        <span class="n">temp_path</span> <span class="o">=</span> <span class="n">get_most_upper_level_path</span><span class="p">(</span><span class="s1">&#39;df_temp_file.csv&#39;</span><span class="p">)</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="n">escapechar</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">auto_increment_key</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">load_infile_sql</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;  LOAD DATA INFILE &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span>
+<span class="s2">                                    INTO TABLE </span><span class="si">{1}</span><span class="s2"> </span>
+<span class="s2">                                    CHARACTER SET &#39;utf8mb4&#39;</span>
+<span class="s2">                                    FIELDS TERMINATED BY &#39;,&#39; ENCLOSED BY &#39;&quot;&#39;</span>
+<span class="s2">                                    ESCAPED BY &#39;\\&#39;</span>
+<span class="s2">                                    LINES TERMINATED BY &#39;\r\n&#39;</span>
+<span class="s2">                                    (</span><span class="si">{2}</span><span class="s2">)</span>
+<span class="s2">                                    SET </span><span class="si">{3}</span><span class="s2"> = NULL; -- 将默认需要自增的键设置为NULL即可正常写入</span>
+<span class="s2">                                    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span><span class="n">table_name</span><span class="p">,</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header_columns</span><span class="p">),</span><span class="n">auto_increment_key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">load_infile_sql</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;  LOAD DATA INFILE &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span>
+<span class="s2">                        INTO TABLE </span><span class="si">{1}</span><span class="s2"> </span>
+<span class="s2">                        CHARACTER SET &#39;utf8mb4&#39;</span>
+<span class="s2">                        FIELDS TERMINATED BY &#39;,&#39; ENCLOSED BY &#39;&quot;&#39;</span>
+<span class="s2">                        ESCAPED BY &#39;\\&#39;</span>
+<span class="s2">                        LINES TERMINATED BY &#39;\r\n&#39;;</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span><span class="n">table_name</span><span class="p">)</span>
+
+        <span class="n">load_infile_sql</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">load_infile_sql</span><span class="p">)</span><span class="o">.</span><span class="n">execution_options</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">load_infile_sql</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+        <span class="c1">#删除temp CSV文档</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">how</span><span class="p">,</span><span class="s1">&#39;写入方法未知,数据未写入&#39;</span><span class="p">)</span>
+
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="load_sql_data"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.load_sql_data">[文档]</a><span class="k">def</span> <span class="nf">load_sql_data</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">table_name</span><span class="p">,</span><span class="n">load_file_path</span><span class="p">,</span><span class="n">if_truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;write csv file into table&quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">poolclass</span><span class="o">=</span><span class="n">NullPool</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+    <span class="c1"># temp_path = get_most_upper_level_path(&#39;df_temp_file.csv&#39;)</span>
+
+
+    <span class="c1">#复制一份数据到英文路径</span>
+    <span class="c1"># copyfile(load_file_path,temp_path)</span>
+
+    <span class="n">load_infile_sql</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;  LOAD DATA INFILE &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span>
+<span class="s2">            INTO TABLE </span><span class="si">{1}</span><span class="s2"> </span>
+<span class="s2">            CHARACTER SET &#39;utf8mb4&#39;</span>
+<span class="s2">            FIELDS TERMINATED BY &#39;,&#39; ENCLOSED BY &#39;&quot;&#39;</span>
+<span class="s2">            ESCAPED BY &#39;\\&#39;</span>
+<span class="s2">            LINES TERMINATED BY &#39;\r\n&#39;;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">load_file_path</span><span class="p">,</span><span class="n">table_name</span><span class="p">)</span>
+    
+    <span class="n">load_infile_sql</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">load_infile_sql</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">load_infile_sql</span><span class="p">)</span>
+
+    <span class="c1">#删除临时文件</span>
+    <span class="c1"># os.remove(temp_path)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">load_file_path</span><span class="p">,</span><span class="s1">&#39;dump complete.&#39;</span><span class="p">)</span>
+
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_sql_data"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.get_sql_data">[文档]</a><span class="k">def</span> <span class="nf">get_sql_data</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">table_name</span><span class="p">,</span><span class="n">sql</span><span class="p">,</span><span class="n">save_path</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;通过SQL获取到目标数据并保存到文档&quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">poolclass</span><span class="o">=</span><span class="n">NullPool</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">how</span> <span class="o">==</span> <span class="s1">&#39;normal&#39;</span><span class="p">:</span>
+        <span class="c1">#execute 返回ResultProxy,fetchall如果为空返回空列表</span>
+        <span class="n">fetchall_result</span> <span class="o">=</span> <span class="n">execute_fetchall</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">result_df</span> <span class="o">=</span> <span class="n">convert_fetchall2df</span><span class="p">(</span><span class="n">fetchall_result</span><span class="p">)</span>
+        <span class="n">result_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">how</span> <span class="o">==</span> <span class="s1">&#39;mysql_dump&#39;</span><span class="p">:</span>
+         <span class="c1">#保存数据到临时目的地,mysqldump不能识别中文的路径，所以必须获取到最高一级的类似C盘C://的路径才能正常写入</span>
+        <span class="n">temp_path</span> <span class="o">=</span> <span class="n">get_most_upper_level_path</span><span class="p">(</span><span class="s1">&#39;df_temp_file.csv&#39;</span><span class="p">)</span>
+
+        <span class="c1">#先获取一次表头,sql输入结尾不能填分号</span>
+        <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="o">==</span>  <span class="n">sql</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">first_row</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_row</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span><span class="s1">&#39;数据提取失败&#39;</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">dump_sql</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;  </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">                        INTO OUTFILE &#39;</span><span class="si">{}</span><span class="s2">&#39; </span>
+<span class="s2">                        CHARACTER SET &#39;utf8mb4&#39;</span>
+<span class="s2">                        FIELDS TERMINATED BY &#39;,&#39; ENCLOSED BY &#39;&quot;&#39;</span>
+<span class="s2">                        ESCAPED BY &#39;\\&#39; </span>
+<span class="s2">                        LINES TERMINATED BY &#39;\r\n&#39; ; </span>
+<span class="s2">                    &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span><span class="n">temp_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">temp_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+
+        <span class="n">dump_sql</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">dump_sql</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">dump_sql</span><span class="p">)</span>
+        <span class="c1">#获取到目标后，将结果复制到目标文件夹并且转换成EXCEL格式</span>
+        <span class="k">if</span> <span class="n">save_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">:</span>
+            <span class="n">result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+            <span class="n">result_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="n">header</span><span class="o">=</span> <span class="n">header</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#如果不是保存的XLSX格式，就直接复制CSV结果到目标文件夹</span>
+            <span class="n">copyfile</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span><span class="n">save_path</span><span class="p">)</span>     
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span><span class="s1">&#39;数据已保存&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">enter_exit</span><span class="p">(</span><span class="n">how</span><span class="p">,</span><span class="s2">&quot;不能识别该导出方式&quot;</span><span class="p">)</span>
+        
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="insert_update_table"><a class="viewcode-back" href="../../common_utils_data.html#common_utils_data.sql_functions.insert_update_table">[文档]</a><span class="k">def</span> <span class="nf">insert_update_table</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">df</span><span class="p">,</span><span class="n">table_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;检查表的主键字段，根据主键字段，采用update的方式更新数据&quot;&quot;&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span><span class="n">poolclass</span><span class="o">=</span><span class="n">NullPool</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    
+    <span class="n">sql_unique_key</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                        SELECT k.COLUMN_NAME</span>
+<span class="s2">                        FROM information_schema.table_constraints t</span>
+<span class="s2">                        LEFT JOIN information_schema.key_column_usage k</span>
+<span class="s2">                        USING(constraint_name,table_schema,table_name)</span>
+<span class="s2">                        WHERE t.constraint_type in (&#39;UNIQUE&#39;,&#39;PRIMARY KEY&#39;) </span>
+<span class="s2">                            AND t.table_schema=DATABASE()</span>
+<span class="s2">                            AND t.table_name=&#39;</span><span class="si">{0}</span><span class="s2">&#39;;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">))</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_unique_key</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+    <span class="c1">#结果只有一列,去掉seq</span>
+    <span class="n">unique_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span><span class="s1">&#39;seq&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">unique_columns</span> <span class="p">:</span>  <span class="c1">#如果存在唯一性约束（包括主键约束）</span>
+        <span class="c1">#需要更新的字段 去掉 唯一性约束字段 就是需要更新的字段</span>
+        <span class="n">update_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_columns</span><span class="p">]</span>
+        <span class="c1">#将数据写入临时表采用insert into on duplicate update的方式更新目的表</span>
+        <span class="n">sql_drop_temp</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot;drop table if exists temp_insert;&quot;</span><span class="p">)</span>
+        
+        <span class="n">sql_insert</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot;&quot;&quot; create temporary table temp_insert as </span>
+<span class="s2">                              (select * from </span><span class="si">{0}</span><span class="s2"> );&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">))</span>
+
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_drop_temp</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_insert</span><span class="p">)</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">&#39;temp_insert&#39;</span><span class="p">,</span><span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span><span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot; set sql_safe_updates = 0; &quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">sql_duplicate_update_list</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span> 
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">update_columns</span><span class="p">:</span> 
+            <span class="n">sql_duplicate_update</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">{0}</span><span class="s2">.</span><span class="si">{1}</span><span class="s2"> = temp_insert.</span><span class="si">{1}</span><span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span><span class="n">u</span><span class="p">)</span>
+            <span class="n">sql_duplicate_update_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql_duplicate_update</span><span class="p">)</span>
+
+        <span class="n">sql_duplicate_update</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_duplicate_update_list</span><span class="p">)</span>
+
+        <span class="n">sql_insert_update</span> <span class="o">=</span>  <span class="n">text</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;insert ignore into </span><span class="si">{0}</span><span class="s2"> </span>
+<span class="s2">                                   select * from temp_insert </span>
+<span class="s2">                                   on duplicate key update </span>
+<span class="s2">                                   </span><span class="si">{1}</span><span class="s2">;&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span><span class="n">sql_duplicate_update</span><span class="p">))</span>
+
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_insert_update</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;drop table temp_insert;&quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span> <span class="c1">#如果不存在唯一性约束,直接写入</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span><span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span><span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span> <span class="p">:</span>
+    <span class="n">engine_text</span> <span class="o">=</span> <span class="n">gen_engine_text</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;E:\脚本\get_sql_data-master\connection_config.ini&quot;</span><span class="p">,</span><span class="s1">&#39;oracle+cx_oracle&#39;</span><span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; select plateSymbol, symbol from scrap_platesymbol  &#39;</span>
+    <span class="n">fetch_result</span> <span class="o">=</span> <span class="n">execute_fetchall_engine</span><span class="p">(</span><span class="n">engine_text</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">fetch_result</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2022, TracyTang.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
