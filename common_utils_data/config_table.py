@@ -18,15 +18,31 @@ from .df_functions import normalize_multi_header,copy_seperate_header_columns,\
 check_abnormal_dates, stack_list_column, df_fillna_str
 from .excel_functions import write_pct_columns
 
-
 warnings.filterwarnings('ignore')
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 from pandas.core.index import MultiIndex
 
 class ConfigReader(object):
+	"""
+	读取配置文件,测试中文搜索内容
 
-	def __init__(self,config_file_dir, config_table_name, config_list,*args, **kwargs):
+	:param config_file_dir: 配置文件路径
+	:type config_file_dir: str
+	:param config_table_name: 配置表格名称
+	:type config_table_name: str
+	:param config_list: 配置列表
+	:type config_list: str
+	:example:尝试对齐能不能实现多行
+			 第二行example注释
+			 再indent一次
+	:return: A buffered writable file descriptor 
+	:rtype: list
+	"""
+	def __init__(self,config_file_dir:str, 
+				 config_table_name:str, 
+				 config_list:str, 
+				 *args, **kwargs) -> list:
 
 		self.config_file_dir = config_file_dir
 		self.config_table_name = config_table_name
@@ -35,7 +51,18 @@ class ConfigReader(object):
 		self.require_file_dir = kwargs.get('require_file_dir','.\\require_tables')
 		self.data_file_dir = kwargs.get('data_file_dir',r"..\\data_files")
 
-	def get_header_table(self,header_table_df):
+	def get_header_table(self, 
+						 header_table_df:pd.DataFrame) -> pd.DataFrame:
+		"""
+		测试中文搜索结果，对齐表格表头的结果,检测波动幅度
+
+		:param header_table_df: 表头表格的dataframe
+		:return: 处理过的表格
+		:example:多行
+				 对齐测试
+				 多一行
+		:raise: Exceptions, FileNotFoundError
+		"""
 		#过滤全都是空的行
 		header_table_df = header_table_df.dropna(how='all',axis=0)
 		header_table_df = df_fillna_str(header_table_df)
@@ -43,7 +70,9 @@ class ConfigReader(object):
 
 		return header_table_df
 
-	def get_complete_header_df(self, header_table_df):
+	def get_complete_header_df(self, 
+							   header_table_df: pd.DataFrame) \
+							   -> tuple[pd.DataFrame, list]:
 		#保留的标准表头数量 以第一列的序号为准
 		header_table_columns = header_table_df.columns
 		standard_column = header_table_df[header_table_columns[0]].fillna('').tolist()
